@@ -1,6 +1,6 @@
 import React from "react";
 
-function PostCard({ post }) {
+function BlogPost({ post }) {
   return (
     <article className="post-card fade-in">
       <h2 className="post-title">{post.title}</h2>
@@ -10,4 +10,4 @@ function PostCard({ post }) {
   );
 }
 
-export default PostCard;
+export default BlogPost;

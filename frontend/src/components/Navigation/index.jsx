@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { isAuthenticated, removeToken } from "../services/auth";
+import { isAuthenticated, removeToken } from "../../services/auth";
 
-function Navbar() {
+function NavigationBar() {
   const navigate = useNavigate();
   const authed = isAuthenticated();
   const [scrolled, setScrolled] = useState(false);
@@ -67,4 +67,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default NavigationBar;

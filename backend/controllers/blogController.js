@@ -25,6 +25,20 @@ exports.getBlogs = async (req, res) => {
   }
 };
 
+// Get single Blog by id
+exports.getBlog = async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id).populate(
+      "user",
+      "username"
+    );
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+    res.status(200).json(blog);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // Update Blog
 exports.updateBlog = async (req, res) => {
   try {
