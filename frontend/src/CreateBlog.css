@@ -1,3 +1,158 @@
+/* Redesigned page-specific styles for the Create Blog content */
+:root {
+  --deep-purple: #4b0082;
+  --light-purple: #c3a9f3;
+  --cream: #faf9f6;
+  --text-gray: #333333;
+  --muted: #7a6f8f;
+}
+
+.create-blog {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 64px 20px;
+  background: transparent; /* global background handled in index.css */
+  color: var(--text-gray);
+  animation: fadeInUp 420ms ease both;
+}
+
+.create-blog__inner {
+  max-width: 980px;
+  width: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(243, 236, 255, 0.95),
+    rgba(250, 249, 246, 0.98)
+  );
+  padding: 36px 40px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(75, 0, 130, 0.08);
+  border: 1px solid rgba(75, 0, 130, 0.06);
+}
+
+.muted {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 0 0 6px 0;
+}
+
+.title {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  margin: 0 0 18px 0;
+  font-weight: 800;
+  color: var(--deep-purple);
+}
+
+.lead {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-gray);
+  margin-bottom: 20px;
+}
+
+.section-title {
+  margin-top: 14px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--deep-purple);
+}
+
+p {
+  color: var(--text-gray);
+}
+
+/* Header / nav */
+.site-header {
+  width: 100%;
+  background: transparent;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(6px);
+}
+.site-header__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+}
+.brand {
+  color: var(--deep-purple);
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+.nav-link {
+  color: var(--muted);
+  margin-left: 18px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 160ms ease, transform 160ms ease;
+}
+.nav-link:hover {
+  color: var(--deep-purple);
+  transform: translateY(-2px);
+}
+.nav-link.cta {
+  color: var(--cream);
+  background: linear-gradient(135deg, var(--deep-purple), var(--light-purple));
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.nav-link.active {
+  color: var(--deep-purple);
+  text-decoration: underline;
+}
+
+.cta-button {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--deep-purple), var(--light-purple));
+  color: var(--cream);
+  padding: 10px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.cta-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(75, 0, 130, 0.12);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+}
+.auth-form input {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(75, 0, 130, 0.06);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-gray);
+}
+
+@media (max-width: 640px) {
+  .create-blog__inner {
+    padding: 18px;
+  }
+  .title {
+    font-size: 1.6rem;
+  }
+}
 /* Page-specific styles for the Create Blog content */
 .create-blog {
   min-height: 100vh;
