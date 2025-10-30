@@ -86,3 +86,81 @@ button:focus-visible {
     transform: translateY(0);
   }
 }
+
+/* Page fade for initial load */
+.page-fade {
+  animation: fadeInUp 420ms ease both;
+}
+
+/* Navbar styles: fixed, transparent -> colored on scroll */
+.site-header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+  background: transparent;
+  transition: background 220ms ease, box-shadow 220ms ease,
+    backdrop-filter 220ms;
+}
+.site-header .site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+}
+.site-header.scrolled {
+  background: rgba(195, 169, 243, 0.95); /* light purple */
+  box-shadow: 0 6px 18px rgba(75, 0, 130, 0.08);
+  backdrop-filter: blur(6px);
+}
+
+/* nav link underline animation */
+.nav-link {
+  position: relative;
+  display: inline-block;
+  padding: 6px 8px;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--deep-purple), var(--light-purple));
+  transition: width 220ms ease;
+  border-radius: 2px;
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Blog card styles */
+.blog-card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 6px 18px rgba(76, 0, 130, 0.06);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+  overflow: hidden;
+  animation: fadeInUp 420ms ease both;
+  animation-delay: var(--delay, 0ms);
+}
+.blog-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 14px 36px rgba(76, 0, 130, 0.12);
+}
+.blog-card strong {
+  display: inline-block;
+  color: var(--deep-purple);
+  transition: color 180ms ease;
+}
+.blog-card strong:hover {
+  color: var(--light-purple);
+}
+
+/* ensure content below header isn't covered */
+main {
+  padding-top: 72px;
+}

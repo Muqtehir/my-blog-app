@@ -6,6 +6,8 @@ export default function Nav() {
     (window.location.hash || "#/").replace(/^#/, "")
   );
 
+  const [scrolled, setScrolled] = useState(false);
+
   const { user, logout } = useUser();
 
   useEffect(() => {
@@ -26,6 +28,13 @@ export default function Nav() {
     };
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   // user is provided by UserContext
 
   const isActive = (path) => {
@@ -34,7 +43,7 @@ export default function Nav() {
   };
 
   return (
-    <header className="site-header">
+    <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
       <div className="site-header__inner">
         <a className="brand" href="#/">
           My Blog

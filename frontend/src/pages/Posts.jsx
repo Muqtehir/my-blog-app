@@ -35,7 +35,7 @@ export default function Posts() {
   };
 
   return (
-    <main style={{ padding: 48 }}>
+    <main className="page-fade" style={{ padding: 48 }}>
       <div
         style={{ maxWidth: 900, margin: "0 auto", color: "var(--text-gray)" }}
       >
@@ -44,13 +44,16 @@ export default function Posts() {
         {error && <p style={{ color: "crimson" }}>{error}</p>}
         {!loading && !error && (
           <ul style={{ listStyle: "none", padding: 0 }}>
-            {blogs.map((b) => (
+            {blogs.map((b, i) => (
               <li
                 key={b._id}
+                className="blog-card"
                 style={{
                   marginBottom: 18,
                   borderBottom: "1px solid #eee",
                   paddingBottom: 12,
+                  // staggered animation delay using CSS variable
+                  ["--delay"]: `${i * 70}ms`,
                 }}
               >
                 <div
