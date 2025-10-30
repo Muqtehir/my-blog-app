@@ -49,6 +49,51 @@ p {
   color: #e6e6e6;
 }
 
+/* Header / nav */
+.site-header {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.site-header__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+}
+.brand {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+.nav-link {
+  color: #ddd;
+  margin-left: 18px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.nav-link.cta {
+  color: #fff;
+  background: #4746ff;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.cta-button {
+  display: inline-block;
+  background: #646cff;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
 @media (max-width: 640px) {
   .create-blog__inner {
     padding: 18px;
