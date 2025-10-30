@@ -84,6 +84,30 @@ p {
   border-radius: 6px;
 }
 
+.nav-link.active {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+}
+.auth-form input {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+}
+
 .cta-button {
   display: inline-block;
   background: #646cff;
