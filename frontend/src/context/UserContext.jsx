@@ -18,7 +18,7 @@ export function UserProvider({ children }) {
       try {
         const resp = await apiGet("/users/me");
         if (mounted && resp && resp.user) setUser(resp.user);
-      } catch (err) {
+      } catch {
         if (mounted) setUser(null);
       }
     }
