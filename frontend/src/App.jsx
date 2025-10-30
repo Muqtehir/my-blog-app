@@ -7,6 +7,7 @@ import EditPost from "./pages/EditPost";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import "./CreateBlog.css";
+import { AnimatePresence, motion } from "framer-motion";
 
 function App() {
   const [route, setRoute] = useState(() => {
@@ -42,7 +43,17 @@ function App() {
   return (
     <div>
       <Nav />
-      {Page}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={route}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.32, ease: "easeOut" }}
+        >
+          {Page}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

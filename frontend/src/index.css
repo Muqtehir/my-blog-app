@@ -5,8 +5,8 @@
   --text-gray: #333333;
   --muted: #7a6f8f;
   --surface: #fff;
-  font-family: system-ui, Avenir, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
+  font-family: system-ui, Avenir, "Segoe UI", Roboto, Helvetica, Arial, Inter,
+    system-ui, Avenir, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -43,6 +43,15 @@ h1 {
   line-height: 1.05;
   color: var(--text-gray);
   margin: 0 0 0.6rem 0;
+  font-family: Poppins, Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
+}
+
+h2,
+h3,
+h4 {
+  font-family: Poppins, Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
 }
 
 button {
