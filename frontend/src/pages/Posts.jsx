@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { apiGet, apiDelete } from "../services/api";
-import { useUser } from "../context/UserContext";
+import { useUser } from "../context/coreUserContext";
 
 export default function Posts() {
   const [blogs, setBlogs] = useState([]);

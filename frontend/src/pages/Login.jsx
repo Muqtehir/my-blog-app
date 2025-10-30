@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { apiPost, apiGet } from "../services/api";
-import { useUser } from "../context/UserContext";
+import { useUser } from "../context/coreUserContext";
 
 export default function Login() {
   const { setUser } = useUser();

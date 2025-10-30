@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { apiGet } from "../services/api";
-
-const UserContext = createContext(null);
+import { UserContext } from "./coreUserContext";
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -50,8 +49,4 @@ export function UserProvider({ children }) {
       {children}
     </UserContext.Provider>
   );
-}
-
-export function useUser() {
-  return useContext(UserContext);
 }
