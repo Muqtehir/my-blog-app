@@ -38,3 +38,14 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Get current logged in user
+exports.getMe = async (req, res) => {
+  try {
+    // auth middleware attaches req.user (without password)
+    if (!req.user) return res.status(401).json({ message: "Not authorized" });
+    res.status(200).json({ success: true, user: req.user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

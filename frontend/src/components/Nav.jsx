@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { apiGet } from "../services/api";
 
 export default function Nav() {
   const [route, setRoute] = useState(() =>
@@ -6,6 +7,7 @@ export default function Nav() {
   );
 
   const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const onHash = () => {
@@ -21,6 +23,27 @@ export default function Nav() {
       window.removeEventListener("storage", onStorage);
     };
   }, []);
+
+  // fetch current user when token is present
+  useEffect(() => {
+    let mounted = true;
+    async function loadUser() {
+      const t = localStorage.getItem("token");
+      if (!t) {
+        if (mounted) setUser(null);
+        return;
+      }
+      try {
+        const resp = await apiGet("/users/me");
+        if (mounted && resp && resp.user) setUser(resp.user);
+      } catch (err) {
+        // if token invalid or error, clear user
+        if (mounted) setUser(null);
+      }
+    }
+    loadUser();
+    return () => (mounted = false);
+  }, [token]);
 
   const isActive = (path) => {
     if ((route === "" || route === "/") && path === "/") return true;
@@ -71,11 +94,17 @@ export default function Nav() {
               <a className="nav-link" href="#/create">
                 New
               </a>
+              {user && (
+                <span className="nav-user" style={{ marginRight: 12 }}>
+                  {user.username}
+                </span>
+              )}
               <button
                 className="nav-link cta"
                 onClick={() => {
                   localStorage.removeItem("token");
                   setToken(null);
+                  setUser(null);
                   window.location.hash = "#/";
                 }}
               >

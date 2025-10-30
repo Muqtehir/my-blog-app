@@ -9,10 +9,10 @@ export default function Posts() {
   const load = async () => {
     setError(null);
     try {
-      const data = await apiGet('/blogs');
+      const data = await apiGet("/blogs");
       setBlogs(data || []);
     } catch (err) {
-      setError(err.message || 'Failed to load');
+      setError(err.message || "Failed to load");
     } finally {
       setLoading(false);
     }
@@ -22,35 +22,79 @@ export default function Posts() {
     load();
   }, []);
 
+  // load current user id (if logged in) so we can conditionally show edit
+  const [currentUserId, setCurrentUserId] = useState(null);
+  useEffect(() => {
+    let mounted = true;
+    async function loadMe() {
+      try {
+        const resp = await apiGet("/users/me");
+        if (mounted && resp && resp.user) setCurrentUserId(resp.user._id);
+      } catch (err) {
+        // ignore (not logged in)
+      }
+    }
+    loadMe();
+    return () => (mounted = false);
+  }, []);
+
   const onDelete = async (id) => {
-    if (!confirm('Delete this post?')) return;
+    if (!confirm("Delete this post?")) return;
     try {
       await apiDelete(`/blogs/${id}`);
       load();
     } catch (err) {
-      alert(err.message || 'Delete failed');
+      alert(err.message || "Delete failed");
     }
   };
 
   return (
     <main style={{ padding: 48 }}>
-      <div style={{ maxWidth: 900, margin: "0 auto", color: "var(--text-gray)" }}>
+      <div
+        style={{ maxWidth: 900, margin: "0 auto", color: "var(--text-gray)" }}
+      >
         <h1>Posts</h1>
         {loading && <p>Loading...</p>}
-        {error && <p style={{ color: 'crimson' }}>{error}</p>}
+        {error && <p style={{ color: "crimson" }}>{error}</p>}
         {!loading && !error && (
-          <ul style={{ listStyle: 'none', padding: 0 }}>
+          <ul style={{ listStyle: "none", padding: 0 }}>
             {blogs.map((b) => (
-              <li key={b._id} style={{ marginBottom: 18, borderBottom: '1px solid #eee', paddingBottom: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <strong style={{ color: 'var(--deep-purple)' }}>{b.title}</strong>
+              <li
+                key={b._id}
+                style={{
+                  marginBottom: 18,
+                  borderBottom: "1px solid #eee",
+                  paddingBottom: 12,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <strong style={{ color: "var(--deep-purple)" }}>
+                    {b.title}
+                  </strong>
                   <div>
-                    <button onClick={() => (window.location.hash = '#/create')} style={{ marginRight: 8 }}>Edit</button>
+                    {b.user && b.user._id === currentUserId && (
+                      <button
+                        onClick={() =>
+                          (window.location.hash = `#/edit/${b._id}`)
+                        }
+                        style={{ marginRight: 8 }}
+                      >
+                        Edit
+                      </button>
+                    )}
                     <button onClick={() => onDelete(b._id)}>Delete</button>
                   </div>
                 </div>
-                <div style={{ color: '#666', marginTop: 6 }}>{b.content}</div>
-                <div style={{ fontSize: 13, color: '#999', marginTop: 6 }}>By {b.user && b.user.username ? b.user.username : 'Unknown'}</div>
+                <div style={{ color: "#666", marginTop: 6 }}>{b.content}</div>
+                <div style={{ fontSize: 13, color: "#999", marginTop: 6 }}>
+                  By {b.user && b.user.username ? b.user.username : "Unknown"}
+                </div>
               </li>
             ))}
           </ul>

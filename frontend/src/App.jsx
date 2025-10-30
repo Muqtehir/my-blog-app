@@ -3,6 +3,7 @@ import Nav from "./components/Nav";
 import Home from "./pages/Home";
 import CreateBlog from "./pages/CreateBlog";
 import Posts from "./pages/Posts";
+import EditPost from "./pages/EditPost";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import "./CreateBlog.css";
@@ -23,7 +24,10 @@ function App() {
   if (route === "/" || route === "") Page = <Home />;
   else if (route === "/create") Page = <CreateBlog />;
   else if (route === "/posts") Page = <Posts />;
-  else if (route === "/login") Page = <Login />;
+  else if (route.startsWith("/edit/")) {
+    const id = route.replace("/edit/", "");
+    Page = <EditPost id={id} />;
+  } else if (route === "/login") Page = <Login />;
   else if (route === "/signup") Page = <Signup />;
   else
     Page = (
