@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { apiGet } from "../services/api";
+import { useUser } from "../context/UserContext";
 
 export default function Nav() {
   const [route, setRoute] = useState(() =>
     (window.location.hash || "#/").replace(/^#/, "")
   );
 
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
-  const [user, setUser] = useState(null);
+  const { user, logout } = useUser();
 
   useEffect(() => {
     const onHash = () => {
       setRoute((window.location.hash || "#/").replace(/^#/, ""));
-      setToken(localStorage.getItem("token"));
     };
     window.addEventListener("hashchange", onHash);
     // also listen to storage changes from other tabs
-    const onStorage = () => setToken(localStorage.getItem("token"));
+    // user context listens for storage updates; no local token state needed here
+    // keep nav responsive to storage changes as well
+    const onStorage = () => {
+      // no-op here; context will handle user updates
+    };
     window.addEventListener("storage", onStorage);
     return () => {
       window.removeEventListener("hashchange", onHash);
@@ -24,26 +26,7 @@ export default function Nav() {
     };
   }, []);
 
-  // fetch current user when token is present
-  useEffect(() => {
-    let mounted = true;
-    async function loadUser() {
-      const t = localStorage.getItem("token");
-      if (!t) {
-        if (mounted) setUser(null);
-        return;
-      }
-      try {
-        const resp = await apiGet("/users/me");
-        if (mounted && resp && resp.user) setUser(resp.user);
-      } catch (err) {
-        // if token invalid or error, clear user
-        if (mounted) setUser(null);
-      }
-    }
-    loadUser();
-    return () => (mounted = false);
-  }, [token]);
+  // user is provided by UserContext
 
   const isActive = (path) => {
     if ((route === "" || route === "/") && path === "/") return true;
@@ -72,7 +55,7 @@ export default function Nav() {
           >
             Posts
           </a>
-          {!token ? (
+          {!user ? (
             <>
               <a
                 className={`nav-link ${isActive("/login") ? "active" : ""}`}
@@ -102,10 +85,7 @@ export default function Nav() {
               <button
                 className="nav-link cta"
                 onClick={() => {
-                  localStorage.removeItem("token");
-                  setToken(null);
-                  setUser(null);
-                  window.location.hash = "#/";
+                  logout();
                 }}
               >
                 Logout

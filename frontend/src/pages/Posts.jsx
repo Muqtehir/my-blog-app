@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { apiGet, apiDelete } from "../services/api";
+import { useUser } from "../context/UserContext";
 
 export default function Posts() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useUser();
 
   const load = async () => {
     setError(null);
@@ -20,22 +22,6 @@ export default function Posts() {
 
   useEffect(() => {
     load();
-  }, []);
-
-  // load current user id (if logged in) so we can conditionally show edit
-  const [currentUserId, setCurrentUserId] = useState(null);
-  useEffect(() => {
-    let mounted = true;
-    async function loadMe() {
-      try {
-        const resp = await apiGet("/users/me");
-        if (mounted && resp && resp.user) setCurrentUserId(resp.user._id);
-      } catch (err) {
-        // ignore (not logged in)
-      }
-    }
-    loadMe();
-    return () => (mounted = false);
   }, []);
 
   const onDelete = async (id) => {
@@ -78,17 +64,19 @@ export default function Posts() {
                     {b.title}
                   </strong>
                   <div>
-                    {b.user && b.user._id === currentUserId && (
-                      <button
-                        onClick={() =>
-                          (window.location.hash = `#/edit/${b._id}`)
-                        }
-                        style={{ marginRight: 8 }}
-                      >
-                        Edit
-                      </button>
+                    {b.user && b.user._id === user?._id && (
+                      <>
+                        <button
+                          onClick={() =>
+                            (window.location.hash = `#/edit/${b._id}`)
+                          }
+                          style={{ marginRight: 8 }}
+                        >
+                          Edit
+                        </button>
+                        <button onClick={() => onDelete(b._id)}>Delete</button>
+                      </>
                     )}
-                    <button onClick={() => onDelete(b._id)}>Delete</button>
                   </div>
                 </div>
                 <div style={{ color: "#666", marginTop: 6 }}>{b.content}</div>

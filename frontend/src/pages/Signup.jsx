@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { apiPost } from "../services/api";
+import { apiPost, apiGet } from "../services/api";
+import { useUser } from "../context/UserContext";
 
 export default function Signup() {
+  const { setUser } = useUser();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +20,12 @@ export default function Signup() {
       });
       if (data && data.token) {
         localStorage.setItem("token", data.token);
+        try {
+          const me = await apiGet("/users/me");
+          if (me && me.user) setUser(me.user);
+        } catch {
+          // provider will handle
+        }
       } else {
         throw new Error(
           data && data.message ? data.message : "Invalid signup response"

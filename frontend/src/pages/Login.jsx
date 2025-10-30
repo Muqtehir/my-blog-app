@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { apiPost } from "../services/api";
+import { apiPost, apiGet } from "../services/api";
+import { useUser } from "../context/UserContext";
 
 export default function Login() {
+  const { setUser } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -13,6 +15,13 @@ export default function Login() {
       const data = await apiPost("/users/login", { email, password });
       if (data && data.token) {
         localStorage.setItem("token", data.token);
+        // fetch and set user in context
+        try {
+          const me = await apiGet("/users/me");
+          if (me && me.user) setUser(me.user);
+        } catch {
+          // ignore — provider will handle
+        }
       } else {
         throw new Error(
           data && data.message ? data.message : "Invalid login response"
