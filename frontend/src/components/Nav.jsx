@@ -83,8 +83,8 @@ export default function Nav() {
             </>
           ) : (
             <>
-              <a className="nav-link" href="#/create">
-                New
+              <a className="nav-link new-post" href="#/create">
+                New Post
               </a>
               {user && (
                 <span className="nav-user" style={{ marginRight: 12 }}>

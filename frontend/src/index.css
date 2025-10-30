@@ -55,12 +55,12 @@ button {
   background: linear-gradient(135deg, var(--deep-purple), var(--light-purple));
   color: var(--cream);
   cursor: pointer;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition: all 300ms ease;
   box-shadow: 0 6px 18px rgba(75, 0, 130, 0.12);
 }
 button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(75, 0, 130, 0.16);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 16px 40px rgba(75, 0, 130, 0.18);
 }
 button:focus,
 button:focus-visible {
@@ -68,10 +68,84 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+/* Specific New Post button in the navbar */
+.nav-link.new-post {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #4b0082, #c3a9f3);
+  color: var(--cream) !important;
+  font-weight: 800;
+  box-shadow: 0 8px 22px rgba(75, 0, 130, 0.12);
+  transition: all 0.3s ease;
+}
+.nav-link.new-post:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 20px 48px rgba(75, 0, 130, 0.22);
+  filter: drop-shadow(0 6px 20px rgba(76, 0, 130, 0.18));
+}
+
 /* responsive small tweaks */
 @media (max-width: 640px) {
   body {
     padding: 12px;
+  }
+}
+
+/* Responsive layout tweaks */
+@media (max-width: 900px) {
+  .site-header .site-header__inner {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .nav-link {
+    font-size: 14px;
+    padding: 6px;
+  }
+  .nav-link.new-post {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+  .blog-card {
+    padding: 14px;
+  }
+  main {
+    padding-top: 64px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --text-gray: #222;
+  }
+  h1 {
+    font-size: 1.6rem;
+  }
+  .site-header .site-header__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  nav[aria-label="Main navigation"] {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .blog-card {
+    border-radius: 12px;
+  }
+  main {
+    padding-top: 72px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+/* Larger screens: increase container widths */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
   }
 }
 
@@ -112,7 +186,6 @@ button:focus-visible {
 .site-header.scrolled {
   background: rgba(195, 169, 243, 0.95); /* light purple */
   box-shadow: 0 6px 18px rgba(75, 0, 130, 0.08);
-  backdrop-filter: blur(6px);
 }
 
 /* nav link underline animation */
