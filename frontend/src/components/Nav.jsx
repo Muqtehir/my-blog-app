@@ -5,11 +5,21 @@ export default function Nav() {
     (window.location.hash || "#/").replace(/^#/, "")
   );
 
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
+
   useEffect(() => {
-    const onHash = () =>
+    const onHash = () => {
       setRoute((window.location.hash || "#/").replace(/^#/, ""));
+      setToken(localStorage.getItem("token"));
+    };
     window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    // also listen to storage changes from other tabs
+    const onStorage = () => setToken(localStorage.getItem("token"));
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("hashchange", onHash);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   const isActive = (path) => {
@@ -39,18 +49,40 @@ export default function Nav() {
           >
             Posts
           </a>
-          <a
-            className={`nav-link ${isActive("/login") ? "active" : ""}`}
-            href="#/login"
-          >
-            Login
-          </a>
-          <a
-            className={`nav-link cta ${isActive("/signup") ? "active" : ""}`}
-            href="#/signup"
-          >
-            Signup
-          </a>
+          {!token ? (
+            <>
+              <a
+                className={`nav-link ${isActive("/login") ? "active" : ""}`}
+                href="#/login"
+              >
+                Login
+              </a>
+              <a
+                className={`nav-link cta ${
+                  isActive("/signup") ? "active" : ""
+                }`}
+                href="#/signup"
+              >
+                Signup
+              </a>
+            </>
+          ) : (
+            <>
+              <a className="nav-link" href="#/create">
+                New
+              </a>
+              <button
+                className="nav-link cta"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  setToken(null);
+                  window.location.hash = "#/";
+                }}
+              >
+                Logout
+              </button>
+            </>
+          )}
         </nav>
       </div>
     </header>
