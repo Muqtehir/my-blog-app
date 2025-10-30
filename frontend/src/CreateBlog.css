@@ -1,0 +1,59 @@
+/* Page-specific styles for the Create Blog content */
+.create-blog {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 20px;
+  background: transparent; /* global background handled in index.css */
+  color: #fff;
+}
+
+.create-blog__inner {
+  max-width: 1000px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 28px 32px;
+  border-radius: 6px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+.muted {
+  font-size: 0.9rem;
+  color: #ddd;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 0 0 6px 0;
+}
+
+.title {
+  font-size: 2.2rem;
+  margin: 0 0 18px 0;
+  font-weight: 800;
+}
+
+.lead {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #eee;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  margin-top: 14px;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+p {
+  color: #e6e6e6;
+}
+
+@media (max-width: 640px) {
+  .create-blog__inner {
+    padding: 18px;
+  }
+  .title {
+    font-size: 1.6rem;
+  }
+}
