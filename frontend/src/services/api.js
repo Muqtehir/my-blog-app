@@ -12,10 +12,16 @@ async function request(path, options = {}) {
   const token = getToken();
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${api.base}${path}`, {
-    ...options,
-    headers,
-  });
+  let res;
+  try {
+    res = await fetch(`${api.base}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch (err) {
+    // network error (DNS, offline, CORS failure, etc.)
+    throw new Error(err.message || "Network error");
+  }
 
   // Try to parse JSON body (if any)
   const data = await res.json().catch(() => null);
@@ -25,15 +31,21 @@ async function request(path, options = {}) {
     // Clear token and notify app to logout
     try {
       localStorage.removeItem("token");
-    } catch (e) {}
+    } catch {
+      /* ignore errors when trying to clear token */
+    }
     // dispatch a custom event so context/providers can react in this tab
     try {
       window.dispatchEvent(new CustomEvent("auth:logout"));
-    } catch (e) {}
+    } catch {
+      /* ignore errors when dispatching logout event */
+    }
     // redirect to login
     try {
       window.location.hash = "#/login";
-    } catch (e) {}
+    } catch {
+      /* ignore errors when redirecting to login */
+    }
     const errMsg = (data && data.message) || "Not authorized";
     throw new Error(errMsg);
   }
