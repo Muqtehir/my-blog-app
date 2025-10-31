@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { apiGet, apiPut } from "../services/api";
+import { useUser } from "../context/coreUserContext";
 
 export default function EditPost({ id }) {
+  const { user, loading: userLoading } = useUser();
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) window.location.hash = "#/login";
-  }, []);
+    if (!userLoading && !user) window.location.hash = "#/login";
+  }, [userLoading, user]);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");

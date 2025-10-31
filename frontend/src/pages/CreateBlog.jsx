@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { apiPost } from "../services/api";
+import { useUser } from "../context/coreUserContext";
 
 export default function CreateBlog() {
+  const [title, setTitle] = useState("");
+
+  const { user, loading } = useUser();
   useEffect(() => {
-    // If there's no token, send user to login
-    const token = localStorage.getItem("token");
-    if (!token) {
+    // wait for user verification, then redirect if not logged in
+    if (!loading && !user) {
       window.location.hash = "#/login";
     }
-  }, []);
-
-  const [title, setTitle] = useState("");
+  }, [loading, user]);
   const [content, setContent] = useState("");
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    setSubmitting(true);
     try {
       await apiPost("/blogs", { title, content });
       window.location.hash = "#/posts";
     } catch (err) {
       setError(err.message || "Create failed");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -56,8 +57,8 @@ export default function CreateBlog() {
               required
             />
           </label>
-          <button type="submit" className="cta-button" disabled={loading}>
-            {loading ? "Posting..." : "Publish"}
+          <button type="submit" className="cta-button" disabled={submitting}>
+            {submitting ? "Posting..." : "Publish"}
           </button>
         </form>
       </div>

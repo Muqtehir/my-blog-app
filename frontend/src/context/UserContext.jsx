@@ -4,14 +4,17 @@ import { UserContext } from "./coreUserContext";
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
 
     async function loadUser() {
+      setLoading(true);
       const token = localStorage.getItem("token");
       if (!token) {
         if (mounted) setUser(null);
+        if (mounted) setLoading(false);
         return;
       }
       try {
@@ -19,6 +22,8 @@ export function UserProvider({ children }) {
         if (mounted && resp && resp.user) setUser(resp.user);
       } catch {
         if (mounted) setUser(null);
+      } finally {
+        if (mounted) setLoading(false);
       }
     }
 
@@ -27,14 +32,26 @@ export function UserProvider({ children }) {
     const onStorage = () => {
       // when token changes in another tab
       const t = localStorage.getItem("token");
-      if (!t) setUser(null);
-      else loadUser();
+      if (!t) {
+        setUser(null);
+        setLoading(false);
+      } else {
+        loadUser();
+      }
+    };
+
+    const onLogout = () => {
+      // handle auth:logout dispatched from api
+      setUser(null);
+      setLoading(false);
     };
 
     window.addEventListener("storage", onStorage);
+    window.addEventListener("auth:logout", onLogout);
     return () => {
       mounted = false;
       window.removeEventListener("storage", onStorage);
+      window.removeEventListener("auth:logout", onLogout);
     };
   }, []);
 
@@ -45,7 +62,7 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout }}>
+    <UserContext.Provider value={{ user, setUser, logout, loading }}>
       {children}
     </UserContext.Provider>
   );
