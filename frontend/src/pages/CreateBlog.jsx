@@ -1,7 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { apiPost } from "../services/api";
 
 export default function CreateBlog() {
+  useEffect(() => {
+    // If there's no token, send user to login
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.hash = "#/login";
+    }
+  }, []);
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [error, setError] = useState(null);
