@@ -246,3 +246,25 @@ button:focus-visible {
 main {
   padding-top: 72px;
 }
+
+/* Post details and modal styles */
+.post-details h1 {
+  margin-top: 0;
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 10, 18, 0.5);
+  z-index: 2000;
+}
+.modal {
+  background: var(--surface);
+  padding: 18px 20px;
+  border-radius: 12px;
+  max-width: 520px;
+  width: 92%;
+  box-shadow: 0 20px 60px rgba(12, 10, 18, 0.18);
+}

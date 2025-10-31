@@ -38,7 +38,7 @@ export default function Home() {
             {blogs.map((b) => (
               <li key={b._id} style={{ marginBottom: 18 }}>
                 <a
-                  href={`#/posts`}
+                  href={`#/posts/${b._id}`}
                   style={{
                     color: "var(--deep-purple)",
                     fontWeight: 700,

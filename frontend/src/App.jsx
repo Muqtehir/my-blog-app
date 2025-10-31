@@ -4,9 +4,11 @@ import Home from "./pages/Home";
 import CreateBlog from "./pages/CreateBlog";
 import Posts from "./pages/Posts";
 import EditPost from "./pages/EditPost";
+import PostDetails from "./pages/PostDetails";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import "./CreateBlog.css";
+// eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from "framer-motion";
 
 function App() {
@@ -24,7 +26,10 @@ function App() {
   let Page = null;
   if (route === "/" || route === "") Page = <Home />;
   else if (route === "/create") Page = <CreateBlog />;
-  else if (route === "/posts") Page = <Posts />;
+  else if (route.startsWith("/posts/")) {
+    const id = route.replace("/posts/", "");
+    Page = <PostDetails id={id} />;
+  } else if (route === "/posts") Page = <Posts />;
   else if (route.startsWith("/edit/")) {
     const id = route.replace("/edit/", "");
     Page = <EditPost id={id} />;

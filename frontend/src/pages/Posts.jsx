@@ -63,9 +63,16 @@ export default function Posts() {
                     alignItems: "center",
                   }}
                 >
-                  <strong style={{ color: "var(--deep-purple)" }}>
+                  <a
+                    href={`#/posts/${b._id}`}
+                    style={{
+                      color: "var(--deep-purple)",
+                      fontWeight: 700,
+                      textDecoration: "none",
+                    }}
+                  >
                     {b.title}
-                  </strong>
+                  </a>
                   <div>
                     {b.user && b.user._id === user?._id && (
                       <>
