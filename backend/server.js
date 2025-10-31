@@ -4,6 +4,7 @@ const express = require("express");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 const cors = require("cors");
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(cors());
 
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 app.get("/", (req, res) => res.send("API is running..."));
 

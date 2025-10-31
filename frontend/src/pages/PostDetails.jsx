@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { apiGet, apiPut, apiDelete } from "../services/api";
+import { apiGet, apiPut, apiDelete, apiPost } from "../services/api";
 import { useUser } from "../context/coreUserContext";
 
 export default function PostDetails({ id }) {
@@ -10,6 +10,8 @@ export default function PostDetails({ id }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [commentName, setCommentName] = useState("");
+  const [commentContent, setCommentContent] = useState("");
   const { user } = useUser();
 
   useEffect(() => {
@@ -97,6 +99,21 @@ export default function PostDetails({ id }) {
               <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.8 }}>
                 {post.content}
               </div>
+              {/* Tags & image */}
+              {post.tags && post.tags.length > 0 && (
+                <div style={{ marginTop: 12 }}>
+                  {post.tags.map((t) => (
+                    <span key={t} style={{ marginRight: 8, color: "#666" }}>
+                      #{t}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {post.image && (
+                <div style={{ marginTop: 12 }}>
+                  <img src={post.image} alt="post" style={{ maxWidth: 640 }} />
+                </div>
+              )}
               <div style={{ marginTop: 18 }}>
                 {isOwner && (
                   <>
@@ -163,7 +180,75 @@ export default function PostDetails({ id }) {
             </form>
           )}
         </article>
+        {/* Comments */}
+        <section style={{ marginTop: 32 }}>
+          <h3>Comments</h3>
+          {post.comments && post.comments.length > 0 ? (
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              {post.comments.map((c) => (
+                <li key={c._id} style={{ marginBottom: 12 }}>
+                  <div style={{ fontWeight: 700 }}>{c.name}</div>
+                  <div style={{ fontSize: 12, color: "#777" }}>
+                    {new Date(c.createdAt).toLocaleString()}
+                  </div>
+                  <div style={{ marginTop: 6, whiteSpace: "pre-wrap" }}>
+                    {c.content}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div style={{ color: "#666" }}>No comments yet — be the first!</div>
+          )}
 
+          <div style={{ marginTop: 16 }}>
+            <h4>Leave a comment</h4>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const name =
+                    commentName || (user && user.username) || "Anonymous";
+                  const res = await apiPost(`/blogs/${id}/comments`, {
+                    name,
+                    content: commentContent,
+                  });
+                  // append comment locally
+                  setCommentContent("");
+                  setCommentName("");
+                  setPost((p) => ({
+                    ...p,
+                    comments: [...(p.comments || []), res],
+                  }));
+                } catch (err) {
+                  alert(err.message || "Failed to add comment");
+                }
+              }}
+            >
+              <div style={{ marginBottom: 8 }}>
+                <input
+                  placeholder="Your name"
+                  value={commentName}
+                  onChange={(e) => setCommentName(e.target.value)}
+                  style={{ padding: 8, width: "100%" }}
+                />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <textarea
+                  placeholder="Write a comment"
+                  value={commentContent}
+                  onChange={(e) => setCommentContent(e.target.value)}
+                  rows={4}
+                  style={{ padding: 8, width: "100%" }}
+                  required
+                />
+              </div>
+              <div>
+                <button type="submit">Post comment</button>
+              </div>
+            </form>
+          </div>
+        </section>
         {deleting && (
           <div className="modal-overlay">
             <div className="modal">

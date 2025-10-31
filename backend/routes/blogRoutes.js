@@ -5,6 +5,8 @@ const {
   getBlog,
   updateBlog,
   deleteBlog,
+  addComment,
+  addReaction,
 } = require("../controllers/blogController");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -17,5 +19,11 @@ router
   .get(getBlog)
   .put(protect, updateBlog)
   .delete(protect, deleteBlog);
+
+// Comments (public)
+router.post("/:id/comments", addComment);
+
+// Reactions (protected)
+router.post("/:id/reactions", protect, addReaction);
 
 module.exports = router;

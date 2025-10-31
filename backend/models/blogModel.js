@@ -15,6 +15,41 @@ const blogSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    image: {
+      type: String,
+      default: null,
+    },
+    tags: {
+      type: [String],
+      default: [],
+    },
+    reactions: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        type: {
+          type: String,
+          enum: ["like", "love", "thumbs"],
+          default: "like",
+        },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    comments: [
+      {
+        name: { type: String, required: true },
+        content: { type: String, required: true },
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: false,
+        },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );

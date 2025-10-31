@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { apiPost } from "../services/api";
+import { apiPost, apiUpload } from "../services/api";
 import { useUser } from "../context/coreUserContext";
 
 export default function CreateBlog() {
@@ -13,6 +13,9 @@ export default function CreateBlog() {
     }
   }, [loading, user]);
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState("");
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -21,7 +24,23 @@ export default function CreateBlog() {
     setError(null);
     setSubmitting(true);
     try {
-      await apiPost("/blogs", { title, content });
+      let imageUrl = null;
+      if (file) {
+        const fd = new FormData();
+        fd.append("image", file);
+        const up = await apiUpload("/uploads", fd);
+        imageUrl = up && up.url ? up.url : null;
+      }
+      const tagsArr = tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+      await apiPost("/blogs", {
+        title,
+        content,
+        image: imageUrl,
+        tags: tagsArr,
+      });
       window.location.hash = "#/posts";
     } catch (err) {
       setError(err.message || "Create failed");
@@ -57,6 +76,28 @@ export default function CreateBlog() {
               required
             />
           </label>
+          <label>
+            Tags (comma separated)
+            <input value={tags} onChange={(e) => setTags(e.target.value)} />
+          </label>
+          <label>
+            Image (optional)
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const f = e.target.files[0];
+                setFile(f || null);
+                if (f) setPreview(URL.createObjectURL(f));
+                else setPreview(null);
+              }}
+            />
+          </label>
+          {preview && (
+            <div style={{ marginBottom: 12 }}>
+              <img src={preview} alt="preview" style={{ maxWidth: 320 }} />
+            </div>
+          )}
           <button type="submit" className="cta-button" disabled={submitting}>
             {submitting ? "Posting..." : "Publish"}
           </button>

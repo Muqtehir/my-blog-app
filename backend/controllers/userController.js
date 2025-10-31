@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Blog = require("../models/blogModel");
 
 // Register
 exports.registerUser = async (req, res) => {
@@ -45,6 +46,21 @@ exports.getMe = async (req, res) => {
     // auth middleware attaches req.user (without password)
     if (!req.user) return res.status(401).json({ message: "Not authorized" });
     res.status(200).json({ success: true, user: req.user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get public profile by username (public)
+exports.getProfileByUsername = async (req, res) => {
+  try {
+    const username = req.params.username;
+    const user = await User.findOne({ username }).select(
+      "_id username email createdAt"
+    );
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const posts = await Blog.find({ user: user._id }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, user, posts });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

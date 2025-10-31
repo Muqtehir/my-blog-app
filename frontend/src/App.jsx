@@ -7,9 +7,11 @@ import EditPost from "./pages/EditPost";
 import PostDetails from "./pages/PostDetails";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 import "./CreateBlog.css";
 // eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from "framer-motion";
+import { Toaster } from "./components/Toast";
 
 function App() {
   const [route, setRoute] = useState(() => {
@@ -29,6 +31,9 @@ function App() {
   else if (route.startsWith("/posts/")) {
     const id = route.replace("/posts/", "");
     Page = <PostDetails id={id} />;
+  } else if (route.startsWith("/profile/")) {
+    const username = route.replace("/profile/", "");
+    Page = <Profile username={username} />;
   } else if (route === "/posts") Page = <Posts />;
   else if (route.startsWith("/edit/")) {
     const id = route.replace("/edit/", "");
@@ -47,6 +52,7 @@ function App() {
 
   return (
     <div>
+      <Toaster position="top-right" />
       <Nav />
       <AnimatePresence mode="wait">
         <motion.div

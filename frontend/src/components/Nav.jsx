@@ -7,6 +7,24 @@ export default function Nav() {
   );
 
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [dark, setDark] = useState(() => {
+    try {
+      return localStorage.getItem("theme") === "dark";
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      if (dark) document.documentElement.classList.add("dark");
+      else document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", dark ? "dark" : "light");
+    } catch {
+      /* ignore */
+    }
+  }, [dark]);
 
   const { user, logout } = useUser();
 
@@ -45,22 +63,68 @@ export default function Nav() {
   return (
     <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
       <div className="site-header__inner">
-        <a className="brand" href="#/">
+        <a className="brand" href="#/" onClick={() => setOpen(false)}>
           My Blog
         </a>
-        <nav aria-label="Main navigation">
-          <a className={`nav-link ${isActive("/") ? "active" : ""}`} href="#/">
+        <button
+          className="nav-toggle"
+          aria-expanded={open}
+          aria-label="Toggle navigation"
+          onClick={() => setOpen((s) => !s)}
+        >
+          ☰
+        </button>
+        <button
+          className="nav-toggle theme-toggle"
+          aria-pressed={dark}
+          aria-label="Toggle theme"
+          onClick={() => setDark((d) => !d)}
+          title={dark ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {dark ? "🌙" : "🌞"}
+        </button>
+        <nav className={open ? "open" : ""} aria-label="Main navigation">
+          <div style={{ display: "inline-block", marginRight: 12 }}>
+            <input
+              placeholder="Search posts..."
+              aria-label="Search posts"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const q = e.target.value.trim();
+                  try {
+                    window.dispatchEvent(
+                      new CustomEvent("search:query", { detail: { q } })
+                    );
+                  } catch (err) {
+                    void err;
+                  }
+                }
+              }}
+              style={{
+                padding: "6px 8px",
+                borderRadius: 6,
+                border: "1px solid #ddd",
+              }}
+            />
+          </div>
+          <a
+            className={`nav-link ${isActive("/") ? "active" : ""}`}
+            href="#/"
+            onClick={() => setOpen(false)}
+          >
             Home
           </a>
           <a
             className={`nav-link ${isActive("/create") ? "active" : ""}`}
             href="#/create"
+            onClick={() => setOpen(false)}
           >
             Create Blog
           </a>
           <a
             className={`nav-link ${isActive("/posts") ? "active" : ""}`}
             href="#/posts"
+            onClick={() => setOpen(false)}
           >
             Posts
           </a>
@@ -69,6 +133,7 @@ export default function Nav() {
               <a
                 className={`nav-link ${isActive("/login") ? "active" : ""}`}
                 href="#/login"
+                onClick={() => setOpen(false)}
               >
                 Login
               </a>
@@ -77,23 +142,36 @@ export default function Nav() {
                   isActive("/signup") ? "active" : ""
                 }`}
                 href="#/signup"
+                onClick={() => setOpen(false)}
               >
                 Signup
               </a>
             </>
           ) : (
             <>
-              <a className="nav-link new-post" href="#/create">
+              <a
+                className="nav-link new-post"
+                href="#/create"
+                onClick={() => setOpen(false)}
+              >
                 New Post
               </a>
               {user && (
-                <span className="nav-user" style={{ marginRight: 12 }}>
-                  {user.username}
-                </span>
+                <>
+                  <a
+                    className="nav-link"
+                    href={`#/profile/${user.username}`}
+                    style={{ marginRight: 8 }}
+                    onClick={() => setOpen(false)}
+                  >
+                    {user.username}
+                  </a>
+                </>
               )}
               <button
                 className="nav-link cta"
                 onClick={() => {
+                  setOpen(false);
                   logout();
                 }}
               >

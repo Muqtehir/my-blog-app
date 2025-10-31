@@ -8,7 +8,9 @@ function getToken() {
 
 async function request(path, options = {}) {
   const headers = options.headers || {};
-  headers["Content-Type"] = "application/json";
+  // If body is FormData, browser will set Content-Type including boundary — do not override
+  const isFormData = options.body instanceof FormData;
+  if (!isFormData) headers["Content-Type"] = "application/json";
   const token = getToken();
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -61,6 +63,8 @@ async function request(path, options = {}) {
 export const apiGet = (path) => request(path, { method: "GET" });
 export const apiPost = (path, body) =>
   request(path, { method: "POST", body: JSON.stringify(body) });
+export const apiUpload = (path, formData) =>
+  request(path, { method: "POST", body: formData });
 export const apiPut = (path, body) =>
   request(path, { method: "PUT", body: JSON.stringify(body) });
 export const apiDelete = (path) => request(path, { method: "DELETE" });
