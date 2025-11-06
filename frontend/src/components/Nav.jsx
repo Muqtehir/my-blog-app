@@ -64,7 +64,8 @@ export default function Nav() {
     <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
       <div className="site-header__inner">
         <a className="brand" href="#/" onClick={() => setOpen(false)}>
-          My Blog
+          <span className="brand-text">My Blog</span>
+          <span className="brand-dot">.</span>
         </a>
         <button
           className="nav-toggle"
@@ -83,8 +84,31 @@ export default function Nav() {
         >
           {dark ? "🌙" : "🌞"}
         </button>
-        <nav className={open ? "open" : ""} aria-label="Main navigation">
-          <div style={{ display: "inline-block", marginRight: 12 }}>
+        <nav
+          className={`${
+            open ? "open" : ""
+          } flex flex-col md:flex-row items-start md:items-center`}
+          aria-label="Main navigation"
+        >
+          <a
+            className={`nav-link ${
+              isActive("/privacy") ? "active" : ""
+            } w-full md:w-auto`}
+            href="#/privacy"
+            onClick={() => setOpen(false)}
+          >
+            Privacy Policy
+          </a>
+          <a
+            className={`nav-link ${
+              isActive("/terms") ? "active" : ""
+            } w-full md:w-auto`}
+            href="#/terms"
+            onClick={() => setOpen(false)}
+          >
+            Terms of Service
+          </a>
+          <div className="w-full md:w-auto md:inline-block md:mr-3">
             <input
               placeholder="Search posts..."
               aria-label="Search posts"
@@ -108,21 +132,27 @@ export default function Nav() {
             />
           </div>
           <a
-            className={`nav-link ${isActive("/") ? "active" : ""}`}
+            className={`nav-link ${
+              isActive("/") ? "active" : ""
+            } w-full md:w-auto`}
             href="#/"
             onClick={() => setOpen(false)}
           >
             Home
           </a>
           <a
-            className={`nav-link ${isActive("/create") ? "active" : ""}`}
+            className={`nav-link ${
+              isActive("/create") ? "active" : ""
+            } w-full md:w-auto`}
             href="#/create"
             onClick={() => setOpen(false)}
           >
             Create Blog
           </a>
           <a
-            className={`nav-link ${isActive("/posts") ? "active" : ""}`}
+            className={`nav-link ${
+              isActive("/posts") ? "active" : ""
+            } w-full md:w-auto`}
             href="#/posts"
             onClick={() => setOpen(false)}
           >

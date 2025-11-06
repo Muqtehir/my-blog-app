@@ -1,0 +1,314 @@
+/* Vibrant login page with animated gradient background */
+.auth-page {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 40px 20px;
+  background: linear-gradient(-45deg, #ff6b6b, #4ecdc4, #45b7d1, #96c93d);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  overflow: hidden;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Interactive floating blobs */
+.auth-page::before,
+.auth-page::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.7;
+  pointer-events: none;
+  animation: float 6s ease-in-out infinite;
+}
+
+.auth-page::before {
+  width: 520px;
+  height: 520px;
+  left: -10%;
+  top: -20%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 107, 107, 0.95),
+    rgba(78, 205, 196, 0.65) 40%,
+    transparent 60%
+  );
+  animation-delay: -3s;
+}
+
+.auth-page::after {
+  width: 420px;
+  height: 420px;
+  right: -8%;
+  bottom: -12%;
+  background: radial-gradient(
+    circle at 70% 70%,
+    rgba(150, 201, 61, 0.9),
+    rgba(69, 183, 209, 0.55) 35%,
+    transparent 60%
+  );
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.auth-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  /* Glassmorphism: subtle translucent surface */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border-radius: 16px;
+  padding: 28px 28px 32px;
+  box-shadow: 0 10px 30px rgba(12, 8, 28, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  overflow: hidden;
+  /* subtle mount animation */
+  animation: fadeInUp 420ms ease both;
+}
+
+.auth-card .brand {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.auth-card .tagline {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 18px;
+}
+
+.auth-card h1 {
+  margin: 8px 0 18px 0;
+  color: #fff;
+  font-size: 1.4rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.95rem;
+}
+.auth-form input {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.03),
+    rgba(0, 0, 0, 0.14)
+  );
+  color: #fff;
+  outline: none;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* Social / continue buttons */
+.social-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.social-button {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 0;
+  color: #111;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.85)
+  );
+  box-shadow: 0 8px 28px rgba(12, 8, 32, 0.12);
+}
+.social-button.google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  /* Google-style blue button */
+  background: linear-gradient(180deg, #4a90e2 0%, #357ae8 100%);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 8px 18px rgba(53, 122, 232, 0.18);
+}
+.social-button.google .icon {
+  /* white circular background for the multi-color Google mark */
+  background: #fff;
+  border-radius: 50%;
+  padding: 2px;
+}
+.social-button.apple {
+  /* Apple-style black button */
+  background: linear-gradient(180deg, #000 0%, #111 100%);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.36);
+}
+.social-button.email {
+  /* Purple button matching site theme */
+  background: linear-gradient(135deg, #8a4bff 0%, #6a3bd6 100%);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 10px 26px rgba(106, 59, 214, 0.16);
+}
+
+/* Hover and focus states for accessibility */
+.social-button:hover {
+  transform: translateY(-2px);
+}
+.social-button:active {
+  transform: translateY(1px);
+}
+.social-button:focus-visible {
+  outline: 3px solid rgba(138, 75, 255, 0.18);
+  outline-offset: 3px;
+}
+
+.social-button .icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+.social-button.google .icon svg,
+.social-button.apple .icon svg,
+.social-button.email .icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.social-button .icon img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.social-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-form input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Staggered reveal for card children (uses existing fadeInUp keyframes in global styles) */
+.auth-card > * {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeInUp 420ms ease both;
+}
+.auth-card .brand {
+  animation-delay: 40ms;
+}
+.auth-card .tagline {
+  animation-delay: 100ms;
+}
+.auth-card .auth-form {
+  animation-delay: 160ms;
+}
+.auth-card .social-group {
+  animation-delay: 220ms;
+}
+.auth-card .auth-footer {
+  animation-delay: 300ms;
+}
+
+.cta-button {
+  margin-top: 6px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(138, 75, 255, 0.95),
+    rgba(106, 59, 214, 0.95)
+  );
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 10px 26px rgba(106, 59, 214, 0.18),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.auth-footer {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+}
+
+.auth-card::after {
+  /* subtle glossy highlight */
+  content: "";
+  position: absolute;
+  left: -40%;
+  top: -40%;
+  width: 200%;
+  height: 60%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0)
+  );
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .auth-page {
+    padding: 20px 12px;
+  }
+  .auth-card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+}

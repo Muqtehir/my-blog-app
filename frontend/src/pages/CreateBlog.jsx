@@ -52,7 +52,6 @@ export default function CreateBlog() {
   return (
     <main className="create-blog" id="create-blog" style={{ paddingTop: 24 }}>
       <div className="create-blog__inner">
-        <h2 className="muted">CREATE A BLOG WEBSITE</h2>
         <h1 className="title">Create a new post</h1>
 
         {error && (

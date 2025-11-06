@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Nav from "./components/Nav";
+import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import CreateBlog from "./pages/CreateBlog";
 import Posts from "./pages/Posts";
@@ -8,6 +9,8 @@ import PostDetails from "./pages/PostDetails";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import "./CreateBlog.css";
 // eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from "framer-motion";
@@ -40,6 +43,8 @@ function App() {
     Page = <EditPost id={id} />;
   } else if (route === "/login") Page = <Login />;
   else if (route === "/signup") Page = <Signup />;
+  else if (route === "/privacy") Page = <PrivacyPolicy />;
+  else if (route === "/terms") Page = <TermsOfService />;
   else
     Page = (
       <main style={{ padding: 48 }}>
@@ -51,7 +56,7 @@ function App() {
     );
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <Toaster position="top-right" />
       <Nav />
       <AnimatePresence mode="wait">
@@ -61,10 +66,12 @@ function App() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.32, ease: "easeOut" }}
+          className="flex-grow"
         >
           {Page}
         </motion.div>
       </AnimatePresence>
+      <Footer />
     </div>
   );
 }
