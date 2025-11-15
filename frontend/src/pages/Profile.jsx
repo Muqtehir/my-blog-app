@@ -1,69 +1,94 @@
 import React, { useEffect, useState } from "react";
-import { apiGet } from "../services/api";
+import "./Profile.css";
 
-export default function Profile({ username }) {
-  const [profile, setProfile] = useState(null);
+const Profile = () => {
+  const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    let mounted = true;
-    async function load() {
-      setError(null);
+    const fetchProfile = async () => {
       try {
-        const data = await apiGet(`/users/${username}`);
-        if (!mounted) return;
-        setProfile(data.user || null);
-        setPosts(data.posts || []);
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await fetch("http://localhost:5000/api/profile/me", {
+          headers,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        }
+        setLoading(false);
       } catch (err) {
-        if (mounted) setError(err.message || "Failed to load profile");
-      } finally {
-        if (mounted) setLoading(false);
+        console.error("Failed to fetch profile:", err);
+        setLoading(false);
       }
+    };
+
+    fetchProfile();
+  }, [token]);
+
+  useEffect(() => {
+    if (user) {
+      const fetchPosts = async () => {
+        try {
+          const res = await fetch("http://localhost:5000/api/blogs");
+          if (res.ok) {
+            const blogs = await res.json();
+            const userBlogs = (blogs.blogs || blogs || []).filter(
+              (b) => b.user === user._id
+            );
+            setPosts(userBlogs);
+          }
+        } catch (err) {
+          console.error("Failed to fetch posts:", err);
+        }
+      };
+      fetchPosts();
     }
-    load();
-    return () => (mounted = false);
-  }, [username]);
+  }, [user]);
 
-  if (loading)
-    return (
-      <main style={{ padding: 48 }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>Loading...</div>
-      </main>
-    );
+  if (loading) return <p className="loading">Loading profile...</p>;
 
-  if (error)
+  if (!user)
     return (
-      <main style={{ padding: 48 }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", color: "crimson" }}>
-          {error}
-        </div>
-      </main>
+      <h2 style={{ color: "red", textAlign: "center" }}>
+        You are not logged in.
+      </h2>
     );
 
   return (
-    <main style={{ padding: 48 }}>
-      <div
-        style={{ maxWidth: 900, margin: "0 auto", color: "var(--text-gray)" }}
-      >
-        <h1>{profile.username}</h1>
-        <p>Joined: {new Date(profile.createdAt).toLocaleDateString()}</p>
+    <div className="profile-container">
+      <div className="profile-header">
+        <img
+          src={user.profileImage || "/default-avatar.png"}
+          alt="profile"
+          className="profile-pic"
+        />
 
-        <h2 style={{ marginTop: 24 }}>Posts</h2>
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {posts.map((p) => (
-            <li key={p._id} style={{ marginBottom: 18 }}>
-              <a
-                href={`#/posts/${p._id}`}
-                style={{ color: "var(--deep-purple)", fontWeight: 700 }}
-              >
-                {p.title}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <div>
+          <h2>{user.username}</h2>
+          <p>{user.email}</p>
+          <p>{user.bio || "No bio yet."}</p>
+        </div>
       </div>
-    </main>
+
+      <h3>Your Posts</h3>
+      <div className="posts-list">
+        {posts.length === 0 ? (
+          <p>No posts yet.</p>
+        ) : (
+          posts.map((p) => (
+            <div key={p._id} className="post-card">
+              <h4>{p.title}</h4>
+              <p>{p.content.substring(0, 100)}...</p>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   );
-}
+};
+
+export default Profile;

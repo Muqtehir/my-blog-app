@@ -3,6 +3,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Blog = require("../models/blogModel");
 
+exports.getProfile = async (req, res) => {
+  res.json({ user: req.user });
+};
+
 // Register
 exports.registerUser = async (req, res) => {
   try {

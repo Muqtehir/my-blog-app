@@ -3,6 +3,11 @@ const Blog = require("../models/blogModel");
 // Create Blog
 exports.createBlog = async (req, res) => {
   try {
+    // Debug logs: show who is calling and payload (password not included on req.user)
+    console.log("[createBlog] incoming request", {
+      user: req.user ? { id: req.user.id, username: req.user.username } : null,
+      body: req.body,
+    });
     const { title, content, image, tags } = req.body;
     // Basic validation for empty fields
     if (!title || !content)
@@ -23,8 +28,11 @@ exports.createBlog = async (req, res) => {
             .filter(Boolean)
         : [],
     });
+
+    console.log("[createBlog] created blog id=", blog._id);
     res.status(201).json(blog);
   } catch (err) {
+    console.error("[createBlog] error:", err);
     if (err.name === "ValidationError") {
       // Mongoose validation error -> send 400 with details
       return res.status(400).json({ message: err.message, errors: err.errors });

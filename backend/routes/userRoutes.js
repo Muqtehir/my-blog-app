@@ -3,6 +3,7 @@ const {
   registerUser,
   loginUser,
   getMe,
+  getProfile,
   getProfileByUsername,
 } = require("../controllers/userController");
 const { protect } = require("../middleware/authMiddleware");
@@ -12,7 +13,7 @@ const router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/me", protect, getMe);
-router.get("/:username", getProfileByUsername);
+router.get("/profile", protect, getProfile);
 
 // Admin routes
 router.get("/", protect, async (req, res, next) => {
@@ -26,6 +27,8 @@ router.get("/", protect, async (req, res, next) => {
     next(err);
   }
 });
+
+router.get("/:username", getProfileByUsername);
 
 router.delete("/:id", protect, async (req, res, next) => {
   try {

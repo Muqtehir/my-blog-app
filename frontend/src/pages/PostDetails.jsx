@@ -1,281 +1,247 @@
 import React, { useEffect, useState } from "react";
-import { apiGet, apiPut, apiDelete, apiPost } from "../services/api";
-import { useUser } from "../context/coreUserContext";
+import { useParams, Link } from "react-router-dom";
+import {
+  fetchComments,
+  createComment,
+  fetchReactions,
+  addReaction,
+} from "../services/api";
+import "./PostDetails.css";
 
-export default function PostDetails({ id }) {
-  const [post, setPost] = useState(null);
+const emojiTypes = [
+  { key: "like", label: "👍" },
+  { key: "love", label: "❤️" },
+  { key: "fire", label: "🔥" },
+  { key: "laugh", label: "😂" },
+];
+
+const PostDetails = ({ posts }) => {
+  const { id } = useParams();
+  const post = posts.find((p) => p.id.toString() === id);
+
+  const [comments, setComments] = useState([]);
+  const [reactions, setReactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [editing, setEditing] = useState(false);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [deleting, setDeleting] = useState(false);
-  const [commentName, setCommentName] = useState("");
-  const [commentContent, setCommentContent] = useState("");
-  const { user } = useUser();
+
+  const [commentText, setCommentText] = useState("");
+  const [username, setUsername] = useState("Anonymous"); // you can replace with logged-in user
+  const [posting, setPosting] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
+    if (!post) return;
+    setLoading(true);
     async function load() {
-      setError(null);
-      try {
-        const data = await apiGet(`/blogs/${id}`);
-        if (!mounted) return;
-        setPost(data);
-        setTitle(data.title || "");
-        setContent(data.content || "");
-      } catch (err) {
-        if (mounted) setError(err.message || "Failed to load post");
-      } finally {
-        if (mounted) setLoading(false);
-      }
+      const [c, r] = await Promise.all([
+        fetchComments(post.id),
+        fetchReactions(post.id),
+      ]);
+      setComments(c || []);
+      setReactions(r || []);
+      setLoading(false);
     }
     load();
-    return () => (mounted = false);
-  }, [id]);
+  }, [post]);
 
-  const onSave = async (e) => {
+  if (!post) {
+    return (
+      <div className="post-not-found neon-card">
+        <h2>Post not found</h2>
+        <Link to="/posts" className="neon-btn">
+          ← Back to posts
+        </Link>
+      </div>
+    );
+  }
+
+  // reaction counts helper
+  const reactionCounts = emojiTypes.reduce((acc, e) => {
+    acc[e.key] = reactions.filter((r) => r.type === e.key).length;
+    return acc;
+  }, {});
+
+  const handleReact = async (type) => {
+    // For demo, userId is localStorage token or random
+    const userId =
+      localStorage.getItem("token") || `anon-${Date.now().toString()}`;
+    const payload = { postId: post._id ? post._id : post.id, type, userId };
+
+    const res = await addReaction(payload);
+    if (res) {
+      // Optimistic refresh: fetch reactions again
+      const r = await fetchReactions(post._id ? post._id : post.id);
+      setReactions(r || []);
+    } else {
+      alert("Could not add reaction right now.");
+    }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: post.title,
+          text: post.content.slice(0, 120),
+          url,
+        });
+      } catch (err) {
+        console.error("share error", err);
+      }
+    } else {
+      // fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(url);
+        alert("Link copied to clipboard!");
+      } catch {
+        alert("Copy failed — please copy the URL manually.");
+      }
+    }
+  };
+
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const updated = await apiPut(`/blogs/${id}`, { title, content });
-      setPost(updated);
-      setEditing(false);
-    } catch (err) {
-      alert(err.message || "Update failed");
+    if (!commentText.trim()) return;
+    setPosting(true);
+
+    const body = {
+      postId: post._id ? post._id : post.id,
+      username,
+      text: commentText.trim(),
+    };
+
+    const res = await createComment(body);
+    if (res) {
+      // append comment to UI
+      setComments((prev) => [res, ...prev]);
+      setCommentText("");
+    } else {
+      alert("Could not post comment right now.");
     }
+
+    setPosting(false);
   };
-
-  const onDelete = async () => {
-    try {
-      await apiDelete(`/blogs/${id}`);
-      // go back to posts list
-      window.location.hash = "#/posts";
-    } catch (err) {
-      alert(err.message || "Delete failed");
-    }
-  };
-
-  if (loading)
-    return (
-      <main style={{ padding: 48 }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>Loading...</div>
-      </main>
-    );
-
-  if (error)
-    return (
-      <main style={{ padding: 48 }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", color: "crimson" }}>
-          {error}
-        </div>
-      </main>
-    );
-
-  if (!post)
-    return (
-      <main style={{ padding: 48 }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>Post not found</div>
-      </main>
-    );
-
-  const isOwner = user && post.user && user._id === post.user._id;
 
   return (
-    <main className="page-fade" style={{ padding: 48 }}>
-      <div
-        style={{ maxWidth: 900, margin: "0 auto", color: "var(--text-gray)" }}
-      >
-        <article className="post-details">
-          {!editing ? (
-            <>
-              <h1>{post.title}</h1>
-              <div style={{ fontSize: 13, color: "#777", marginBottom: 12 }}>
-                By{" "}
-                {post.user && post.user.username
-                  ? post.user.username
-                  : "Unknown"}{" "}
-                • {new Date(post.createdAt).toLocaleString()}
-              </div>
-              <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.8 }}>
-                {post.content}
-              </div>
-              {/* Tags & image */}
-              {post.tags && post.tags.length > 0 && (
-                <div style={{ marginTop: 12 }}>
-                  {post.tags.map((t) => (
-                    <span key={t} style={{ marginRight: 8, color: "#666" }}>
-                      #{t}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {post.image && (
-                <div style={{ marginTop: 12 }}>
-                  <img src={post.image} alt="post" style={{ maxWidth: 640 }} />
-                </div>
-              )}
-              <div style={{ marginTop: 18 }}>
-                {isOwner && (
-                  <>
-                    <button
-                      style={{ marginRight: 8 }}
-                      onClick={() => setEditing(true)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => setDeleting(true)}
-                      style={{
-                        background: "#fff",
-                        color: "#b00",
-                        boxShadow: "none",
-                        border: "1px solid #f3c2c2",
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </>
-                )}
-                <button
-                  style={{ marginLeft: 12 }}
-                  onClick={() => (window.location.hash = "#/posts")}
-                >
-                  Back to posts
-                </button>
-              </div>
-            </>
-          ) : (
-            <form onSubmit={onSave}>
-              <div style={{ marginBottom: 12 }}>
-                <label style={{ display: "block", marginBottom: 6 }}>
-                  Title
-                </label>
-                <input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <label style={{ display: "block", marginBottom: 6 }}>
-                  Content
-                </label>
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  required
-                  rows={10}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <button type="submit" style={{ marginRight: 8 }}>
-                  Save
-                </button>
-                <button type="button" onClick={() => setEditing(false)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          )}
-        </article>
-        {/* Comments */}
-        <section style={{ marginTop: 32 }}>
-          <h3>Comments</h3>
-          {post.comments && post.comments.length > 0 ? (
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              {post.comments.map((c) => (
-                <li key={c._id} style={{ marginBottom: 12 }}>
-                  <div style={{ fontWeight: 700 }}>{c.name}</div>
-                  <div style={{ fontSize: 12, color: "#777" }}>
-                    {new Date(c.createdAt).toLocaleString()}
-                  </div>
-                  <div style={{ marginTop: 6, whiteSpace: "pre-wrap" }}>
-                    {c.content}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div style={{ color: "#666" }}>No comments yet — be the first!</div>
-          )}
+    <div className="post-details-wrapper">
+      <article className="neon-card post-details">
+        <h1 className="neon-title">{post.title}</h1>
+        <p className="neon-date">Published: {post.date}</p>
 
-          <div style={{ marginTop: 16 }}>
-            <h4>Leave a comment</h4>
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                try {
-                  const name =
-                    commentName || (user && user.username) || "Anonymous";
-                  const res = await apiPost(`/blogs/${id}/comments`, {
-                    name,
-                    content: commentContent,
-                  });
-                  // append comment locally
-                  setCommentContent("");
-                  setCommentName("");
-                  setPost((p) => ({
-                    ...p,
-                    comments: [...(p.comments || []), res],
-                  }));
-                } catch (err) {
-                  alert(err.message || "Failed to add comment");
-                }
+        {post.image && (
+          <img src={post.image} className="post-hero" alt="cover" />
+        )}
+
+        <div className="post-body">
+          <p>{post.content}</p>
+        </div>
+
+        <div className="post-actions">
+          <div className="reactions">
+            {emojiTypes.map((e) => (
+              <button
+                key={e.key}
+                className="reaction-btn"
+                onClick={() => handleReact(e.key)}
+                title={e.key}
+              >
+                <span className="emoji">{e.label}</span>
+                <span className="count">{reactionCounts[e.key] || 0}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="share-group">
+            <button className="neon-btn" onClick={handleShare}>
+              🔗 Share
+            </button>
+            <a
+              className="neon-btn green"
+              href={`https://wa.me/2347032962346?text=${encodeURIComponent(
+                post.title + " - " + window.location.href
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              💬 WhatsApp
+            </a>
+            <button
+              className="neon-btn outline"
+              onClick={() => {
+                navigator.clipboard
+                  ?.writeText(window.location.href)
+                  .then(() => alert("Copied link!"));
               }}
             >
-              <div style={{ marginBottom: 8 }}>
-                <input
-                  placeholder="Your name"
-                  value={commentName}
-                  onChange={(e) => setCommentName(e.target.value)}
-                  style={{ padding: 8, width: "100%" }}
-                />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <textarea
-                  placeholder="Write a comment"
-                  value={commentContent}
-                  onChange={(e) => setCommentContent(e.target.value)}
-                  rows={4}
-                  style={{ padding: 8, width: "100%" }}
-                  required
-                />
-              </div>
-              <div>
-                <button type="submit">Post comment</button>
-              </div>
-            </form>
+              📋 Copy Link
+            </button>
           </div>
-        </section>
-        {deleting && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <h3>Delete post?</h3>
-              <p>
-                Are you sure you want to delete this post? This action cannot be
-                undone.
-              </p>
-              <div style={{ marginTop: 12 }}>
-                <button
-                  onClick={onDelete}
-                  style={{
-                    marginRight: 8,
-                    background: "#fff",
-                    color: "#b00",
-                    boxShadow: "none",
-                    border: "1px solid #f3c2c2",
-                  }}
-                >
-                  Yes, delete
-                </button>
-                <button onClick={() => setDeleting(false)}>Cancel</button>
-              </div>
+        </div>
+
+        <div className="comments-section">
+          <h3>Comments</h3>
+
+          <form onSubmit={handleCommentSubmit} className="comment-form">
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Your name"
+              className="comment-input name"
+            />
+            <textarea
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Write a thoughtful comment..."
+              className="comment-input"
+              rows="3"
+            />
+            <div style={{ display: "flex", gap: 10 }}>
+              <button type="submit" className="neon-btn" disabled={posting}>
+                {posting ? "Posting..." : "Post Comment"}
+              </button>
+              <button
+                type="button"
+                className="neon-btn outline"
+                onClick={() => {
+                  setCommentText("");
+                }}
+              >
+                Cancel
+              </button>
             </div>
+          </form>
+
+          <div className="comments-list">
+            {loading ? (
+              <p>Loading comments…</p>
+            ) : comments.length === 0 ? (
+              <p className="muted">No comments yet — be the first.</p>
+            ) : (
+              comments.map((c) => (
+                <div
+                  key={c._id || c.id}
+                  className="comment-item neon-card-small"
+                >
+                  <div className="comment-header">
+                    <strong>{c.username}</strong>
+                    <span className="comment-date">
+                      {new Date(
+                        c.createdAt || c.date || c._createdAt || Date.now()
+                      ).toLocaleString()}
+                    </span>
+                  </div>
+                  <p className="comment-text">{c.text}</p>
+                </div>
+              ))
+            )}
           </div>
-        )}
-      </div>
-    </main>
+        </div>
+
+        <Link to="/posts" className="neon-btn back">
+          ← Back to posts
+        </Link>
+      </article>
+    </div>
   );
-}
+};
+
+export default PostDetails;

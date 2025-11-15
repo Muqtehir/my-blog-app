@@ -1,0 +1,59 @@
+/* Position bottom-right */
+.dark-toggle-container {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 9999;
+}
+
+/* Switch box */
+.toggle-switch {
+  width: 60px;
+  height: 30px;
+  border-radius: 50px;
+  background: linear-gradient(to right, #bbb, #ddd);
+  position: relative;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Active switch (dark mode) */
+.toggle-switch.active {
+  background: linear-gradient(to right, #4c00ff, #8a00ff);
+}
+
+/* The circle that slides */
+.switch-circle {
+  width: 26px;
+  height: 26px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: 0.3s ease-in-out;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Move circle to the right when active */
+.toggle-switch.active .switch-circle {
+  left: 32px;
+}
+
+/* Dark mode styling */
+body.dark-mode {
+  background-color: #0d0d0d;
+  color: white;
+}
+
+body.dark-mode a {
+  color: #bb86fc;
+}
+
+body.dark-mode .navbar {
+  background: #111;
+  border-bottom: 1px solid #222;
+}
+
+/* You can extend more dark mode styles later */

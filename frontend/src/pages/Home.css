@@ -1,0 +1,77 @@
+.home-container {
+  padding: 40px;
+}
+
+.home-title {
+  text-align: center;
+  font-size: 2.4rem;
+  margin-bottom: 30px;
+  font-weight: bold;
+  background: linear-gradient(45deg, purple, red, blue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.no-posts {
+  text-align: center;
+  font-size: 1.2rem;
+  color: gray;
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.post-card {
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+.post-image {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+}
+
+.post-content {
+  padding: 15px 18px;
+}
+
+.post-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.post-excerpt {
+  margin: 10px 0;
+  color: #555;
+  line-height: 1.4;
+}
+
+.post-date {
+  font-size: 0.9rem;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+.read-more {
+  text-decoration: none;
+  font-weight: bold;
+  color: purple;
+  transition: color 0.2s ease;
+}
+
+.read-more:hover {
+  color: red;
+}

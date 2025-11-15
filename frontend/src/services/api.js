@@ -1,72 +1,118 @@
-const api = {
-  base: "/api",
-};
+// src/services/api.js
+const API_BASE_URL = "http://localhost:5000";
+const API_BASE = API_BASE_URL;
 
-function getToken() {
-  return localStorage.getItem("token");
-}
-
-async function request(path, options = {}) {
-  const headers = options.headers || {};
-  // If body is FormData, browser will set Content-Type including boundary — do not override
-  const isFormData = options.body instanceof FormData;
-  if (!isFormData) headers["Content-Type"] = "application/json";
-  const token = getToken();
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  let res;
+// COMMENTS
+export async function fetchComments(postId) {
   try {
-    res = await fetch(`${api.base}${path}`, {
-      ...options,
-      headers,
-    });
+    const res = await fetch(`${API_BASE}/api/comments/${postId}`);
+    if (!res.ok) throw new Error("Failed to fetch comments");
+    return await res.json();
   } catch (err) {
-    // network error (DNS, offline, CORS failure, etc.)
-    throw new Error(err.message || "Network error");
+    console.error("fetchComments error:", err);
+    return [];
   }
-
-  // Try to parse JSON body (if any)
-  const data = await res.json().catch(() => null);
-
-  // Global handling for unauthorized
-  if (res.status === 401) {
-    // Clear token and notify app to logout
-    try {
-      localStorage.removeItem("token");
-    } catch {
-      /* ignore errors when trying to clear token */
-    }
-    // dispatch a custom event so context/providers can react in this tab
-    try {
-      window.dispatchEvent(new CustomEvent("auth:logout"));
-    } catch {
-      /* ignore errors when dispatching logout event */
-    }
-    // redirect to login
-    try {
-      window.location.hash = "#/login";
-    } catch {
-      /* ignore errors when redirecting to login */
-    }
-    const errMsg = (data && data.message) || "Not authorized";
-    throw new Error(errMsg);
-  }
-
-  if (!res.ok) {
-    const err = data && data.message ? data.message : res.statusText;
-    throw new Error(err || "Request failed");
-  }
-
-  return data;
 }
 
-export const apiGet = (path) => request(path, { method: "GET" });
-export const apiPost = (path, body) =>
-  request(path, { method: "POST", body: JSON.stringify(body) });
-export const apiUpload = (path, formData) =>
-  request(path, { method: "POST", body: formData });
-export const apiPut = (path, body) =>
-  request(path, { method: "PUT", body: JSON.stringify(body) });
-export const apiDelete = (path) => request(path, { method: "DELETE" });
+export async function createComment(comment) {
+  try {
+    const res = await fetch(`${API_BASE}/api/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(comment),
+    });
+    if (!res.ok) throw new Error("Failed to post comment");
+    return await res.json();
+  } catch (err) {
+    console.error("createComment error:", err);
+    return null;
+  }
+}
 
-export default api;
+// REACTIONS
+export async function fetchReactions(postId) {
+  try {
+    const res = await fetch(`${API_BASE}/api/reactions/${postId}`);
+    if (!res.ok) throw new Error("Failed to fetch reactions");
+    return await res.json();
+  } catch (err) {
+    console.error("fetchReactions error:", err);
+    return [];
+  }
+}
+
+export async function addReaction(reaction) {
+  try {
+    const res = await fetch(`${API_BASE}/api/reactions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reaction),
+    });
+    if (!res.ok) throw new Error("Failed to add reaction");
+    return await res.json();
+  } catch (err) {
+    console.error("addReaction error:", err);
+    return null;
+  }
+}
+
+// 🧠 BLOG ROUTES (use backend /api/blogs)
+export async function getPosts() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/blogs`);
+    const data = await response.json();
+    // backend returns { blogs, page, pages, total } — return the blogs array when present
+    if (data && Array.isArray(data)) return data;
+    if (data && Array.isArray(data.blogs)) return data.blogs;
+    return [];
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return [];
+  }
+}
+
+export async function createBlog(blogData) {
+  try {
+    const token = localStorage.getItem("token");
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE_URL}/api/blogs`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(blogData),
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating blog:", error);
+    return null;
+  }
+}
+
+// 🧩 AUTH ROUTES
+export async function registerUser(userData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Registration error:", error);
+  }
+}
+
+export async function loginUser(userData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Login error:", error);
+  }
+}

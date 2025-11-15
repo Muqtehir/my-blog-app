@@ -1,79 +1,125 @@
-import React, { useEffect, useState } from "react";
-import Nav from "./components/Nav";
-import Footer from "./components/Footer";
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+
+// Components
+import Navbar from "./components/Navbar";
+
+// Pages
 import Home from "./pages/Home";
-import CreateBlog from "./pages/CreateBlog";
-import Posts from "./pages/Posts";
-import EditPost from "./pages/EditPost";
-import PostDetails from "./pages/PostDetails";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import Register from "./pages/Register";
+import CreateBlog from "./pages/CreateBlog";
+import Dashboard from "./pages/Dashboard";
+import Posts from "./pages/Posts";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import PostDetails from "./pages/PostDetails";
+import EditBlog from "./pages/EditBlog";
 import Profile from "./pages/Profile";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import "./CreateBlog.css";
-// eslint-disable-next-line no-unused-vars
-import { AnimatePresence, motion } from "framer-motion";
-import { Toaster } from "./components/Toast";
+import EditProfile from "./pages/EditProfile";
+import DarkModeToggle from "./components/DarkModeToggle";
 
-function App() {
-  const [route, setRoute] = useState(() => {
-    const hash = window.location.hash || "#/";
-    return hash.replace(/^#/, "");
-  });
-
-  useEffect(() => {
-    const onHash = () => setRoute(window.location.hash.replace(/^#/, ""));
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
-
-  let Page = null;
-  if (route === "/" || route === "") Page = <Home />;
-  else if (route === "/create") Page = <CreateBlog />;
-  else if (route.startsWith("/posts/")) {
-    const id = route.replace("/posts/", "");
-    Page = <PostDetails id={id} />;
-  } else if (route.startsWith("/profile/")) {
-    const username = route.replace("/profile/", "");
-    Page = <Profile username={username} />;
-  } else if (route === "/posts") Page = <Posts />;
-  else if (route.startsWith("/edit/")) {
-    const id = route.replace("/edit/", "");
-    Page = <EditPost id={id} />;
-  } else if (route === "/login") Page = <Login />;
-  else if (route === "/signup") Page = <Signup />;
-  else if (route === "/privacy") Page = <PrivacyPolicy />;
-  else if (route === "/terms") Page = <TermsOfService />;
-  else
-    Page = (
-      <main style={{ padding: 48 }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", color: "#fff" }}>
-          <h1>Not Found</h1>
-          <p>Page "{route}" not found. Use navigation to pick a page.</p>
-        </div>
-      </main>
-    );
+// API
+import { getPosts } from "./services/api";
+// AppLayout: shows Navbar on all pages except login/register
+const AppLayout = ({ posts, addPost, deletePost, updatePost }) => {
+  const location = useLocation();
+  const hideNavbar = ["/login", "/register"].includes(location.pathname);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Toaster position="top-right" />
-      <Nav />
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={route}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.32, ease: "easeOut" }}
-          className="flex-grow"
-        >
-          {Page}
-        </motion.div>
-      </AnimatePresence>
-      <Footer />
-    </div>
+    <>
+      {!hideNavbar && <Navbar />}
+      <Routes>
+        <Route path="/" element={<Home posts={posts} />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/create-blog" element={<CreateBlog addPost={addPost} />} />
+        <Route path="/create" element={<CreateBlog addPost={addPost} />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/posts/:id" element={<PostDetails posts={posts} />} />
+        <Route path="/posts" element={<Posts posts={posts} />} />
+        <Route
+          path="/dashboard"
+          element={<Dashboard posts={posts} deletePost={deletePost} />}
+        />
+        <Route
+          path="/edit/:id"
+          element={<EditBlog posts={posts} updatePost={updatePost} />}
+        />
+        <Route path="/profile/:id" element={<Profile />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
+      </Routes>
+    </>
   );
-}
+};
+
+const App = () => {
+  // State to hold all blog posts
+  const [posts, setPosts] = useState([]);
+
+  // Fetch blogs from backend on mount and convert format
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const blogs = await getPosts();
+        // Transform backend format { _id, createdAt } to frontend format { id, date }
+        const transformed = (blogs || []).map((blog) => ({
+          id: blog._id,
+          title: blog.title,
+          content: blog.content,
+          image: blog.image,
+          date: blog.createdAt
+            ? new Date(blog.createdAt).toLocaleDateString()
+            : "Unknown",
+        }));
+        setPosts(transformed);
+      } catch (err) {
+        console.error("Failed to fetch blogs:", err);
+      }
+    };
+    fetchBlogs();
+  }, []);
+
+  // Function to add new post (called after successful create)
+  const addPost = (newPost) => {
+    setPosts((prevPosts) => [newPost, ...prevPosts]);
+  };
+
+  // Function to delete a post
+  const deletePost = (id) => {
+    setPosts((prevPosts) => prevPosts.filter((p) => p.id !== id));
+  };
+
+  // Function to update a post
+  const updatePost = (id, updatedData) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((p) =>
+        p.id.toString() === id.toString() ? { ...p, ...updatedData } : p
+      )
+    );
+  };
+
+  return (
+    <>
+      <Router>
+        <AppLayout
+          posts={posts}
+          addPost={addPost}
+          deletePost={deletePost}
+          updatePost={updatePost}
+        />
+      </Router>
+      <DarkModeToggle />
+    </>
+  );
+};
 
 export default App;
