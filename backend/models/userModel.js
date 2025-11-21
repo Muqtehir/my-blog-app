@@ -18,10 +18,39 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please add a password"],
       minlength: 6,
+      select: false,
     },
     isAdmin: {
       type: Boolean,
       default: false,
+    },
+    profilePic: {
+      type: String,
+      default: "",
+    },
+    bio: {
+      type: String,
+      default: "",
+    },
+    location: {
+      type: String,
+      default: "",
+    },
+    facebook: {
+      type: String,
+      default: "",
+    },
+    instagram: {
+      type: String,
+      default: "",
+    },
+    twitter: {
+      type: String,
+      default: "",
+    },
+    phone: {
+      type: String,
+      default: "",
     },
   },
   { timestamps: true }
@@ -35,11 +64,12 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// Generate JWT Token
+// Generate JWT token
 userSchema.methods.getSignedToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
 };
 
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+module.exports = User;

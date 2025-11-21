@@ -25,7 +25,7 @@ import EditProfile from "./pages/EditProfile";
 import DarkModeToggle from "./components/DarkModeToggle";
 
 // API
-import { getPosts } from "./services/api";
+import { getPosts, updateBlog, deleteBlog } from "./services/api";
 // AppLayout: shows Navbar on all pages except login/register
 const AppLayout = ({ posts, addPost, deletePost, updatePost }) => {
   const location = useLocation();
@@ -37,10 +37,9 @@ const AppLayout = ({ posts, addPost, deletePost, updatePost }) => {
       <Routes>
         <Route path="/" element={<Home posts={posts} />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/signup" element={<Register />} />
         <Route path="/create-blog" element={<CreateBlog addPost={addPost} />} />
         <Route path="/create" element={<CreateBlog addPost={addPost} />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/posts/:id" element={<PostDetails posts={posts} />} />
@@ -79,8 +78,19 @@ const App = () => {
           date: blog.createdAt
             ? new Date(blog.createdAt).toLocaleDateString()
             : "Unknown",
+          user: blog.user, // <-- Add this line
         }));
         setPosts(transformed);
+        // Debugging: show posts and stored user to help diagnose dashboard filtering
+        try {
+          console.log("[App] fetched posts:", transformed);
+          console.log(
+            "[App] stored user:",
+            JSON.parse(localStorage.getItem("user"))
+          );
+        } catch (e) {
+          console.log("[App] debug log error", e);
+        }
       } catch (err) {
         console.error("Failed to fetch blogs:", err);
       }
@@ -94,17 +104,49 @@ const App = () => {
   };
 
   // Function to delete a post
-  const deletePost = (id) => {
-    setPosts((prevPosts) => prevPosts.filter((p) => p.id !== id));
+  const deletePost = async (id) => {
+    try {
+      // call backend to delete
+      const ok = await deleteBlog(id);
+      if (ok) {
+        setPosts((prevPosts) => prevPosts.filter((p) => p.id !== id));
+      } else {
+        alert("Could not delete post on server.");
+      }
+    } catch (err) {
+      console.error("deletePost error:", err);
+      alert("Error deleting post. Check console for details.");
+    }
   };
 
-  // Function to update a post
-  const updatePost = (id, updatedData) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((p) =>
-        p.id.toString() === id.toString() ? { ...p, ...updatedData } : p
-      )
-    );
+  // Function to update a post (sends update to backend)
+  const updatePost = async (id, updatedData) => {
+    try {
+      const res = await updateBlog(id, updatedData);
+      if (res) {
+        // reflect server response (or optimistic merge)
+        const updated = {
+          id: res._id || id,
+          title: res.title || updatedData.title,
+          content: res.content || updatedData.content,
+          image: res.image || updatedData.image,
+          date: res.createdAt || updatedData.date,
+        };
+
+        setPosts((prevPosts) =>
+          prevPosts.map((p) =>
+            p.id.toString() === id.toString() ? { ...p, ...updated } : p
+          )
+        );
+        return true;
+      }
+      alert("Could not update post on server.");
+      return false;
+    } catch (err) {
+      console.error("updatePost error:", err);
+      alert("Error updating post. Check console for details.");
+      return false;
+    }
   };
 
   return (

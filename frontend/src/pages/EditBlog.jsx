@@ -14,8 +14,14 @@ const EditBlog = ({ posts, updatePost }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    updatePost(id, { title, content });
-    navigate("/dashboard");
+    (async () => {
+      const ok = await updatePost(id, { title, content });
+      if (ok) {
+        navigate("/dashboard");
+      } else {
+        alert("Failed to update post on server.");
+      }
+    })();
   };
 
   return (

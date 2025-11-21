@@ -3,13 +3,10 @@ import { NavLink } from "react-router-dom";
 function Navbar() {
   const token = localStorage.getItem("token"); // check if user is logged in
 
-  <NavLink to="/create-blog">Create Blog</NavLink>;
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.href = "/login";
   };
-  <NavLink to="/profile">Profile</NavLink>;
 
   return (
     <nav
@@ -18,7 +15,7 @@ function Navbar() {
         justifyContent: "space-between",
         alignItems: "center",
         padding: "1rem 2rem",
-        background: "linear-gradient(90deg, #6a0dad, #1e90ff, #ff4500)", // purple, blue, red
+        background: "linear-gradient(90deg, #6a0dad, #1e90ff, #ff4500)",
         color: "white",
         fontWeight: "bold",
       }}
@@ -49,6 +46,7 @@ function Navbar() {
             Home
           </NavLink>
         </li>
+
         <li>
           <NavLink
             to="/create"
@@ -60,6 +58,7 @@ function Navbar() {
             Create Blog
           </NavLink>
         </li>
+
         <li>
           <NavLink
             to="/posts"
@@ -71,6 +70,7 @@ function Navbar() {
             Posts
           </NavLink>
         </li>
+
         <li>
           <NavLink
             to="/about"
@@ -82,6 +82,7 @@ function Navbar() {
             About
           </NavLink>
         </li>
+
         <li>
           <NavLink
             to="/contact"
@@ -94,6 +95,22 @@ function Navbar() {
           </NavLink>
         </li>
 
+        {/* ✅ SHOW PROFILE ONLY WHEN LOGGED IN */}
+        {token && (
+          <li>
+            <NavLink
+              to="/profile"
+              style={({ isActive }) => ({
+                color: isActive ? "yellow" : "white",
+                borderBottom: isActive ? "2px solid yellow" : "none",
+              })}
+            >
+              Profile
+            </NavLink>
+          </li>
+        )}
+
+        {/* Login / Logout System */}
         {!token ? (
           <>
             <li>
@@ -107,9 +124,10 @@ function Navbar() {
                 Login
               </NavLink>
             </li>
+
             <li>
               <NavLink
-                to="/register"
+                to="/signup"
                 style={({ isActive }) => ({
                   color: isActive ? "yellow" : "white",
                   borderBottom: isActive ? "2px solid yellow" : "none",

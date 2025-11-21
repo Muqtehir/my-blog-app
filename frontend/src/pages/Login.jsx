@@ -1,125 +1,111 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./Login.css";
+import googleLogo from "../assets/google.webp";
+import appleLogo from "../assets/apple.png";
 import { loginUser } from "../services/api";
-import AuthButton from "../components/AuthButton";
-import { motion } from "framer-motion";
 
 export default function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [message, setMessage] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await loginUser(form);
-    if (res?.token) {
+    setError("");
+    const res = await loginUser(formData);
+    if (res && res.token) {
       localStorage.setItem("token", res.token);
-      setMessage("Login successful!");
-      window.location.href = "/dashboard";
+      navigate("/dashboard");
     } else {
-      setMessage(res?.message || "Invalid credentials");
+      setError(res?.message || "Invalid email or password");
     }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "linear-gradient(135deg, #6a0dad, #1e90ff, #ff4500)",
-        color: "white",
-      }}
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        style={{
-          backgroundColor: "white",
-          padding: "2rem",
-          borderRadius: "12px",
-          boxShadow: "0 5px 15px rgba(0,0,0,0.2)",
-          textAlign: "center",
-          color: "#333",
-          width: "350px",
-        }}
-      >
-        <h2 style={{ marginBottom: "1.5rem" }}>Login to Your Account</h2>
-
-        {/* Social buttons */}
-        <AuthButton
-          provider="google"
-          onClick={() => alert("Google login coming soon")}
-        />
-        <AuthButton
-          provider="apple"
-          onClick={() => alert("Apple login coming soon")}
-        />
-        <AuthButton
-          provider="email"
-          onClick={() => alert("Email login coming soon")}
-        />
-
-        <p style={{ margin: "1rem 0", fontWeight: "bold" }}>OR</p>
-
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-        >
-          <input
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+    <div className="auth-container">
+      <form className="auth-form" onSubmit={handleSubmit}>
+        {error && (
+          <div
             style={{
-              padding: "0.6rem",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              fontSize: "1rem",
-            }}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            style={{
-              padding: "0.6rem",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              fontSize: "1rem",
-            }}
-            required
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "0.6rem",
-              borderRadius: "8px",
-              border: "none",
-              background: "#6a0dad",
-              color: "white",
-              fontWeight: "bold",
-              cursor: "pointer",
+              color: "#ff4d4f",
+              marginBottom: "1rem",
+              textAlign: "center",
             }}
           >
-            Login
-          </button>
-        </form>
-
-        {message && (
-          <p style={{ marginTop: "1rem", color: "red" }}>{message}</p>
+            {error}
+          </div>
         )}
+        <h2>Welcome Back</h2>
+        <p className="auth-subtitle">Login to continue your journey</p>
 
-        <p style={{ marginTop: "1rem" }}>
-          Don't have an account?{" "}
-          <a href="/register" style={{ color: "#6a0dad" }}>
-            Sign Up
-          </a>
+        {/* Email */}
+        <div className="auth-group">
+          <label>Email</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        {/* Password */}
+        <div className="auth-group">
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        {/* Submit */}
+        <button className="auth-btn" type="submit">
+          Login
+        </button>
+
+        {/* OR Divider */}
+        <div className="auth-divider">
+          <span>OR</span>
+        </div>
+
+        {/* Social Buttons */}
+        <div className="social-buttons">
+          <button className="google-btn">
+            <img src={googleLogo} alt="Google Logo" />
+            Continue with Google
+          </button>
+
+          <button className="apple-btn">
+            <img src={appleLogo} alt="Apple Logo" />
+            Continue with Apple
+          </button>
+        </div>
+
+        {/* Bottom Link */}
+        <p className="auth-bottom-text">
+          Don’t have an account?{" "}
+          <Link to="/signup" className="auth-link">
+            Create one
+          </Link>
         </p>
-      </motion.div>
+      </form>
     </div>
   );
 }

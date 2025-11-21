@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./Home.css";
 
-const Home = ({ posts }) => {
+const Home = ({ posts = [] }) => {
   return (
     <div className="home-container">
       <h1 className="home-title">Latest Posts</h1>
@@ -21,9 +21,9 @@ const Home = ({ posts }) => {
                 <h2 className="post-title">{post.title}</h2>
 
                 <p className="post-excerpt">
-                  {post.content.length > 150
+                  {post.content && post.content.length > 150
                     ? post.content.substring(0, 150) + "..."
-                    : post.content}
+                    : post.content || "No content available"}
                 </p>
 
                 <p className="post-date">Published: {post.date}</p>

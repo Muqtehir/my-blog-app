@@ -1,119 +1,181 @@
 /* EditProfile page styles */
 .edit-profile-container {
   padding: 2rem;
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 1000px;
+  margin: 30px auto;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
 }
 
-.edit-profile-container h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  color: #111827;
+.edit-header h2 {
+  font-size: 1.9rem;
+  margin: 0 0 6px 0;
+  color: #0f172a;
+}
+
+.edit-header .sub {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.edit-card {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 28px;
+  margin-top: 18px;
+  background: linear-gradient(180deg, #ffffff, #fbfbff);
+  padding: 26px;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.06);
+  align-items: start;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.image-upload {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-preview {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid #fff;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.12);
+}
+
+.upload-label {
+  display: inline-flex;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.upload-label input[type="file"] {
+  display: none;
+}
+
+.upload-btn {
+  background: linear-gradient(90deg, #4f46e5, #06b6d4);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.12);
+}
+
+.image-hint {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.right {
+  width: 100%;
 }
 
 .edit-profile-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  gap: 14px;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group label {
+.form-row label {
+  display: block;
+  margin-bottom: 8px;
+  color: #0f172a;
   font-weight: 600;
-  color: #374151;
-  font-size: 0.95rem;
 }
 
-.edit-profile-form input[type="text"],
-.edit-profile-form input[type="email"],
-.edit-profile-form textarea {
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 1rem;
+.form-row input,
+.form-row textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e6e9ef;
+  background: #fff;
+  font-size: 0.98rem;
+  color: #0f172a;
+  box-shadow: inset 0 1px 0 rgba(16, 24, 40, 0.02);
 }
 
-.edit-profile-form input[type="text"]:focus,
-.edit-profile-form input[type="email"]:focus,
-.edit-profile-form textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.edit-profile-form textarea {
+.form-row textarea {
   min-height: 120px;
   resize: vertical;
 }
 
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+.form-row input:focus,
+.form-row textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.08);
 }
 
-.save-btn,
-.cancel-btn {
-  flex: 1;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
 }
 
 .save-btn {
-  background: #10b981;
+  background: linear-gradient(90deg, #10b981, #06b6d4);
   color: white;
-}
-
-.save-btn:hover {
-  background: #059669;
-}
-
-.save-btn:disabled {
-  background: #d1d5db;
-  cursor: not-allowed;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .cancel-btn {
-  background: #6b7280;
-  color: white;
-  text-decoration: none;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: transparent;
+  border: 1px solid #e6e9ef;
+  padding: 10px 16px;
+  border-radius: 10px;
+  color: #0f172a;
+  cursor: pointer;
 }
 
-.cancel-btn:hover {
-  background: #4b5563;
+.cancel-btn:disabled,
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.error-message {
-  background: #fee2e2;
+.error-text {
   color: #dc2626;
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  margin: 8px 0 0 0;
+  padding: 8px 12px;
+  background: #fee2e2;
+  border-radius: 6px;
+  border-left: 3px solid #dc2626;
 }
 
-.success-message {
-  background: #dcfce7;
-  color: #16a34a;
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
+@media (max-width: 880px) {
+  .edit-card {
+    grid-template-columns: 1fr;
+  }
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+  .left {
+    align-items: center;
+  }
 }

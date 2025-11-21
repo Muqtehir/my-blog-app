@@ -1,33 +1,46 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-const { uploadImage } = require("../controllers/uploadController");
 const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// configure multer
+// use global __dirname directly in CommonJS
+
+// Storage config
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
+  destination(req, file, cb) {
+    cb(null, path.join(__dirname, "uploads"));
   },
-  filename: function (req, file, cb) {
-    cb(null, `${req.user._id}-${Date.now()}${path.extname(file.originalname)}`);
+  filename(req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
-const upload = multer({ storage });
-if (upload) {
-  // POST /api/uploads  (protected)
-  router.post("/", protect, upload.single("image"), uploadImage);
-} else {
-  // If multer isn't installed, expose a friendly error instead of crashing the server
-  router.post("/", protect, (req, res) => {
-    res.status(501).json({
-      message:
-        "Image upload feature not available. Install 'multer' on the server.",
-    });
-  });
+// File filter
+function checkFileType(file, cb) {
+  const filetypes = /jpg|jpeg|png/;
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = filetypes.test(file.mimetype);
+
+  if (extname && mimetype) cb(null, true);
+  else cb("Images only!", false);
 }
+
+const upload = multer({
+  storage,
+  fileFilter(req, file, cb) {
+    checkFileType(file, cb);
+  },
+});
+
+// Upload route
+router.post("/", protect, upload.single("image"), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+  res.json({
+    url: `/uploads/${req.file.filename}`,
+  });
+});
 
 module.exports = router;

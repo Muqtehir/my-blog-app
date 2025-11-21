@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./Posts.css";
 
-const Posts = ({ posts }) => {
+const Posts = ({ posts = [] }) => {
   return (
     <div className="posts-page-container">
       <h1 className="posts-title">All Blog Posts</h1>
@@ -21,9 +21,9 @@ const Posts = ({ posts }) => {
                 <h2 className="post-title">{post.title}</h2>
 
                 <p className="post-excerpt">
-                  {post.content.length > 150
+                  {post.content && post.content.length > 150
                     ? post.content.substring(0, 150) + "..."
-                    : post.content}
+                    : post.content || "No content available"}
                 </p>
 
                 <p className="post-date">Published: {post.date}</p>

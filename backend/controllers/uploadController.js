@@ -1,51 +1,67 @@
-let cloudinary;
-let streamifier;
-try {
-  cloudinary = require("cloudinary").v2;
-  streamifier = require("streamifier");
-
-  // Configure Cloudinary via env vars in .env
-  if (cloudinary && cloudinary.config) {
-    cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-    });
-  }
-} catch (err) {
-  // Don't crash the server if optional upload dependencies are missing.
-  // The upload endpoint will return a clear error message instead.
-  cloudinary = null;
-  streamifier = null;
-  console.warn(
-    "Optional upload dependencies not installed: upload endpoint disabled.",
-    err && err.message
-  );
-}
+const https = require("https");
 
 exports.uploadImage = async (req, res) => {
   try {
-    if (!cloudinary || !streamifier)
-      return res
-        .status(501)
-        .json({
-          message:
-            "Image upload not available. Install cloudinary and streamifier.",
-        });
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    console.log("[uploadImage] File received:", req.file?.originalname);
 
-    const buffer = req.file.buffer;
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
 
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "blogs" },
-      (error, result) => {
-        if (error) return res.status(500).json({ message: error.message });
-        res.status(200).json({ url: result.secure_url });
-      }
-    );
+    // Convert buffer to base64 for ImgBB API
+    const base64Image = req.file.buffer.toString("base64");
+    const postData = JSON.stringify({
+      image: base64Image,
+    });
 
-    streamifier.createReadStream(buffer).pipe(uploadStream);
+    const options = {
+      hostname: "api.imgbb.com",
+      path: "/1/upload?key=9a509c0b0f5e73b891e47f8c8c8c8c8c",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(postData),
+      },
+    };
+
+    const request = https.request(options, (response) => {
+      let data = "";
+
+      response.on("data", (chunk) => {
+        data += chunk;
+      });
+
+      response.on("end", () => {
+        try {
+          const jsonResponse = JSON.parse(data);
+          if (jsonResponse?.success && jsonResponse?.data?.url) {
+            console.log(
+              "[uploadImage] Upload successful:",
+              jsonResponse.data.url
+            );
+            res.status(200).json({ url: jsonResponse.data.url });
+          } else {
+            console.error("[uploadImage] ImgBB error:", jsonResponse);
+            res
+              .status(500)
+              .json({ message: "Failed to upload image to ImgBB" });
+          }
+        } catch (parseErr) {
+          console.error("[uploadImage] Parse error:", parseErr.message);
+          res.status(500).json({ message: "Invalid response from ImgBB" });
+        }
+      });
+    });
+
+    request.on("error", (err) => {
+      console.error("[uploadImage] Request error:", err.message);
+      res.status(500).json({ message: err.message || "Upload failed" });
+    });
+
+    request.write(postData);
+    request.end();
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("[uploadImage] Error:", err.message);
+    res.status(500).json({ message: err.message || "Upload failed" });
   }
 };

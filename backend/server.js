@@ -1,41 +1,53 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const express = require("express");
-const connectDB = require("./config/db");
-const userRoutes = require("./routes/userRoutes");
-const blogRoutes = require("./routes/blogRoutes");
-const uploadRoutes = require("./routes/uploadRoutes");
-const postRoutes = require("./routes/postRoutes");
+const mongoose = require("mongoose");
+const path = require("path");
 const cors = require("cors");
+
+const connectDB = require("./config/db.js");
+
+const userRoutes = require("./routes/userRoutes.js");
+const blogRoutes = require("./routes/blogRoutes.js");
+const postRoutes = require("./routes/postRoutes.js");
+const profileRoutes = require("./routes/profileRoutes.js");
+const uploadRoutes = require("./routes/uploadRoutes.js");
 
 const app = express();
 
-// Connect to database
+// Connect DB
 connectDB();
 
-// Middleware
+// CORS
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:4173"], // Add your frontend URLs
+    origin: ["http://localhost:5173", "http://localhost:4173"],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// Static folder
+const __dirnameResolved = path.resolve();
+app.use("/uploads", express.static(path.join(__dirnameResolved, "uploads")));
 
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
-app.use("/api/uploads", uploadRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/uploads", uploadRoutes);
 
-// Health check route
-app.get("/", (req, res) => res.send("API is running..."));
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
 
-// Error handling
+// Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("ERROR:", err.stack);
   res.status(500).json({
     message: "Something went wrong!",
     error: err.message,
@@ -43,32 +55,18 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+const server = app.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);
+
+// Crash handlers
+process.on("unhandledRejection", (err) => {
+  console.log(`Unhandled Rejection: ${err.message}`);
+  server.close(() => process.exit(1));
 });
 
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (err, promise) => {
-  console.log(`Error: ${err.message}`);
-  if (server) {
-    server.close(() => process.exit(1));
-  } else {
-    process.exit(1);
-  }
-});
-
-// Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
-  console.log(`Error: ${err.message}`);
-  if (server) {
-    server.close(() => process.exit(1));
-  } else {
-    process.exit(1);
-  }
+  console.log(`Uncaught Exception: ${err.message}`);
+  server.close(() => process.exit(1));
 });
-
-const profileRoutes = require("./routes/profileRoutes");
-app.use("/api/profile", profileRoutes);
-app.use("/api/profile", require("./routes/profileRoutes"));
-app.use("/uploads", express.static("uploads"));
-app.use("/api/upload", require("./routes/uploadRoutes"));

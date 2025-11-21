@@ -1,42 +1,28 @@
 const express = require("express");
-const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
 const User = require("../models/userModel");
 
-// Get logged-in user's profile
-router.get("/me", protect, async (req, res) => {
+const router = express.Router();
+
+// GET profile
+router.get("/me", protect, (req, res) => {
   res.json(req.user);
 });
 
-// Update profile
+// UPDATE profile
 router.put("/update", protect, async (req, res) => {
-  const { username, bio, phone, location } = req.body;
-
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { username, bio, phone, location },
-      { new: true }
-    ).select("-password");
+    const updates = { ...req.body };
+
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
 
     res.json(updatedUser);
   } catch (err) {
-    res.status(500).json({ message: "Error updating profile" });
-  }
-});
-router.put("/update", protect, async (req, res) => {
-  const { username, bio, phone, location, profileImage } = req.body;
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { username, bio, phone, location, profileImage },
-      { new: true }
-    ).select("-password");
-
-    res.json(updatedUser);
-  } catch (err) {
-    res.status(500).json({ message: "Error updating profile" });
+    console.error(err);
+    res.status(500).json({ message: "Profile update failed" });
   }
 });
 

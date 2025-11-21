@@ -30,7 +30,8 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    // include password (it's excluded by default in the model with select:false)
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) return res.status(400).json({ message: "Invalid email" });
 
