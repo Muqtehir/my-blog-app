@@ -10,7 +10,9 @@ exports.getProfile = async (req, res) => {
 // Register
 exports.registerUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    // accept either `username` or `name` from clients
+    const username = req.body.username || req.body.name;
+    const { email, password } = req.body;
     if (!username || !email || !password)
       return res.status(400).json({ message: "All fields are required" });
 

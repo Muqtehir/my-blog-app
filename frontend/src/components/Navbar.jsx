@@ -1,7 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 function Navbar() {
   const token = localStorage.getItem("token"); // check if user is logged in
+  const location = useLocation();
+  const isOnProfile =
+    location.pathname === "/profile" ||
+    location.pathname.startsWith("/profile/");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -49,18 +53,6 @@ function Navbar() {
 
         <li>
           <NavLink
-            to="/create"
-            style={({ isActive }) => ({
-              color: isActive ? "yellow" : "white",
-              borderBottom: isActive ? "2px solid yellow" : "none",
-            })}
-          >
-            Create Blog
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink
             to="/posts"
             style={({ isActive }) => ({
               color: isActive ? "yellow" : "white",
@@ -95,19 +87,35 @@ function Navbar() {
           </NavLink>
         </li>
 
-        {/* ✅ SHOW PROFILE ONLY WHEN LOGGED IN */}
+        {/* ✅ SHOW MY POSTS & PROFILE ONLY WHEN LOGGED IN */}
         {token && (
-          <li>
-            <NavLink
-              to="/profile"
-              style={({ isActive }) => ({
-                color: isActive ? "yellow" : "white",
-                borderBottom: isActive ? "2px solid yellow" : "none",
-              })}
-            >
-              Profile
-            </NavLink>
-          </li>
+          <>
+            {!isOnProfile && (
+              <li>
+                <NavLink
+                  to="/my-posts"
+                  style={({ isActive }) => ({
+                    color: isActive ? "yellow" : "white",
+                    borderBottom: isActive ? "2px solid yellow" : "none",
+                  })}
+                >
+                  My Posts
+                </NavLink>
+              </li>
+            )}
+
+            <li>
+              <NavLink
+                to="/profile"
+                style={({ isActive }) => ({
+                  color: isActive ? "yellow" : "white",
+                  borderBottom: isActive ? "2px solid yellow" : "none",
+                })}
+              >
+                Profile
+              </NavLink>
+            </li>
+          </>
         )}
 
         {/* Login / Logout System */}

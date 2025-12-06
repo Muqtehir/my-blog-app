@@ -32,7 +32,7 @@ const blogSchema = new mongoose.Schema(
         },
         type: {
           type: String,
-          enum: ["like", "love", "thumbs"],
+          enum: ["like", "love", "fire", "laugh"],
           default: "like",
         },
         createdAt: { type: Date, default: Date.now },

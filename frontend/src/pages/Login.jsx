@@ -26,7 +26,7 @@ export default function Login() {
     const res = await loginUser(formData);
     if (res && res.token) {
       localStorage.setItem("token", res.token);
-      navigate("/dashboard");
+      navigate("/posts");
     } else {
       setError(res?.message || "Invalid email or password");
     }

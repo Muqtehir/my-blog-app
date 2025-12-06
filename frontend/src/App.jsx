@@ -22,6 +22,7 @@ import PostDetails from "./pages/PostDetails";
 import EditBlog from "./pages/EditBlog";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import MyPosts from "./pages/MyPosts";
 import DarkModeToggle from "./components/DarkModeToggle";
 
 // API
@@ -40,6 +41,7 @@ const AppLayout = ({ posts, addPost, deletePost, updatePost }) => {
         <Route path="/signup" element={<Register />} />
         <Route path="/create-blog" element={<CreateBlog addPost={addPost} />} />
         <Route path="/create" element={<CreateBlog addPost={addPost} />} />
+        <Route path="/my-posts" element={<MyPosts />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/posts/:id" element={<PostDetails posts={posts} />} />

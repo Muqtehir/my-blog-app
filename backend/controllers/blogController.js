@@ -166,7 +166,7 @@ exports.addReaction = async (req, res) => {
       return res.status(401).json({ message: "Not authorized" });
 
     const { type } = req.body;
-    const allowed = ["like", "love", "thumbs"];
+    const allowed = ["like", "love", "fire", "laugh"];
     const reactionType = allowed.includes(type) ? type : "like";
 
     const blog = await Blog.findById(req.params.id);
@@ -191,15 +191,8 @@ exports.addReaction = async (req, res) => {
 
     await blog.save();
 
-    // compute counts
-    const counts = blog.reactions.reduce((acc, r) => {
-      acc[r.type] = (acc[r.type] || 0) + 1;
-      return acc;
-    }, {});
-
-    const me = blog.reactions.find((r) => r.user.toString() === req.user.id);
-
-    res.status(200).json({ counts, me: me ? me.type : null });
+    // Return the full reactions array so frontend can display them correctly
+    res.status(200).json(blog.reactions);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

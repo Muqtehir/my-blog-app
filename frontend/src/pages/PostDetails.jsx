@@ -222,14 +222,14 @@ const PostDetails = ({ posts }) => {
                   className="comment-item neon-card-small"
                 >
                   <div className="comment-header">
-                    <strong>{c.username}</strong>
+                    <strong>{c.name || c.username || "Anonymous"}</strong>
                     <span className="comment-date">
                       {new Date(
                         c.createdAt || c.date || c._createdAt || Date.now()
                       ).toLocaleString()}
                     </span>
                   </div>
-                  <p className="comment-text">{c.text}</p>
+                  <p className="comment-text">{c.content || c.text}</p>
                 </div>
               ))
             )}

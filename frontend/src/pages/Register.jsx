@@ -7,7 +7,7 @@ import googleLogo from "../assets/google.webp";
 import appleLogo from "../assets/apple.png";
 
 export default function Register() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState({});
 
@@ -22,9 +22,9 @@ export default function Register() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!form.name.trim()) newErrors.name = "Name is required";
-    else if (form.name.trim().length < 5)
-      newErrors.name = "Name must be at least 5 characters";
+    if (!form.username.trim()) newErrors.username = "Username is required";
+    else if (form.username.trim().length < 5)
+      newErrors.username = "Username must be at least 5 characters";
 
     if (!form.email.trim()) newErrors.email = "Email is required";
     else if (!validateEmail(form.email))
@@ -52,7 +52,7 @@ export default function Register() {
 
     if (res?.token) {
       localStorage.setItem("token", res.token);
-      window.location.href = "/dashboard";
+      window.location.href = "/posts";
     } else {
       setMessage(res?.message || "Error registering user");
     }
@@ -112,22 +112,24 @@ export default function Register() {
           <div>
             <input
               type="text"
-              placeholder="Full Name"
-              value={form.name}
+              placeholder="Username"
+              value={form.username}
               onChange={(e) => {
-                setForm({ ...form, name: e.target.value });
-                if (errors.name) setErrors({ ...errors, name: "" });
+                setForm({ ...form, username: e.target.value });
+                if (errors.username) setErrors({ ...errors, username: "" });
               }}
               style={{
                 width: "100%",
                 padding: "10px",
                 fontSize: "1rem",
                 borderRadius: "8px",
-                border: errors.name ? "1px solid red" : "1px solid #ccc",
+                border: errors.username ? "1px solid red" : "1px solid #ccc",
               }}
             />
-            {errors.name && (
-              <p style={{ color: "red", fontSize: "0.8rem" }}>{errors.name}</p>
+            {errors.username && (
+              <p style={{ color: "red", fontSize: "0.8rem" }}>
+                {errors.username}
+              </p>
             )}
           </div>
 
